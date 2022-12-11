@@ -1,0 +1,3 @@
+(component-library "lib" "lib")
+(component-library "sym" "symbols")
+(source-library  ".")

@@ -1,0 +1,27 @@
+v 20210731 2
+C 40000 40000 0 0 0 title-B.sym
+C 41500 49000 1 0 0 ipad.sym
+{
+T 41584 49221 5 10 0 1 0 0 1
+device=IPAD
+T 41500 49038 5 10 1 1 0 0 1
+refdes=IN1
+T 41500 49000 5 10 0 0 0 0 1
+pinnumber=0
+}
+C 41500 48600 1 0 0 ipad.sym
+{
+T 41584 48821 5 10 0 1 0 0 1
+device=IPAD
+T 41500 48638 5 10 1 1 0 0 1
+refdes=IN2
+T 41500 48600 5 10 0 0 0 0 1
+pinnumber=1
+}
+C 42800 48800 1 0 0 opad.sym
+{
+T 43102 49018 5 10 0 1 0 0 1
+device=OPAD
+T 43102 48835 5 10 1 1 0 0 1
+refdes=OUT
+}
