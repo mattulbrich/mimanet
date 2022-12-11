@@ -25,7 +25,7 @@ public class Component {
     }
 
     public int getPinnumber() {
-        return Integer.parseInt(attributes.getOrDefault("pinnumber", "1000"));
+        return Integer.parseInt(attributes.getOrDefault("pinseq", "0"));
     }
 
     public String getAttribute(String attribute) {

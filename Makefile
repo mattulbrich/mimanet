@@ -13,8 +13,9 @@ jar:
 %.net : %.sch
 	lepton-netlist -g mu $< -o $@
 
-%.sym : %.net
+%.sym : %.net $(SYM_NET) 
 	java -jar $(jar) sym $< > $@
 
 clean: 
-	rm $(wildcard lib/*.net) $(LIB_SYM)
+	rm -f $(wildcard lib/*.net) $(LIB_SYM)
+	rm -f $(wildcard sym/*.net) $(wildcard sym/*.sym)

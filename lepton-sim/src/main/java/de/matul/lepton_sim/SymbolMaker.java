@@ -14,7 +14,7 @@ import java.util.Set;
 public class SymbolMaker {
 
     private static final Comparator<? super NumberedPin> COMPARATOR =
-            (x, y) -> y.number - x.number;
+            (x, y) -> x.number - y.number;
     private static final Set<String> PAD_DEVICES =
             Set.of("IPAD", "OPAD", "IOPAD");
 
@@ -48,7 +48,7 @@ public class SymbolMaker {
             System.out.printf("P 0 %d %d %d 1 0 0%n", y, LEAD, y);
             System.out.println("{");
             System.out.printf("T %d %d 9 8 1 1 0 0 1%n", LEAD + STEP/2, y);
-            System.out.println("pinlabel=" + inPin.pin);
+            System.out.println("pinnumber=" + inPin.pin);
             System.out.printf("T %d %d 5 9 0 1 0 2 1%n", LEAD + STEP/2, y);
             System.out.println("pintype=in");
             if (inPin.width != 1) {
@@ -65,7 +65,7 @@ public class SymbolMaker {
                     WIDTH + 2 * LEAD, y, WIDTH + LEAD, y);
             System.out.println("{");
             System.out.printf("T %d %d 9 8 1 1 0 6 1%n", WIDTH + LEAD - STEP/2, y);
-            System.out.println("pinlabel=" + outPin.pin);
+            System.out.println("pinnumber=" + outPin.pin);
             System.out.printf("T %d %d 5 9 0 1 0 8 1%n", WIDTH + LEAD - STEP/2, y);
             System.out.println("pintype=out");
             System.out.println("}");
