@@ -12,7 +12,7 @@ C 46750 47950 1 90 0 IPAD.sym
 T 46529 48034 5 10 0 1 90 0 1
 device=IPAD
 T 46712 47950 5 10 1 1 90 0 1
-refdes=ENABLE
+refdes=EN
 T 46950 47250 5 10 1 0 90 0 1
 pintype=control
 }

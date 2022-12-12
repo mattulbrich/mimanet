@@ -1,0 +1,6 @@
+template = parallel
+n = 24
+component = D_FF
+parallel_IN = DIN
+parallel_OUT = DOUT
+controls = R, W

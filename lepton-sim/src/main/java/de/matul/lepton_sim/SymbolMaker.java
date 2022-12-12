@@ -68,12 +68,33 @@ public class SymbolMaker {
             System.out.println("pinnumber=" + outPin.pin);
             System.out.printf("T %d %d 5 9 0 1 0 8 1%n", WIDTH + LEAD - STEP/2, y);
             System.out.println("pintype=out");
+            if (outPin.width != 1) {
+                System.out.printf("T %d %d 10 5 1 1 0 3 1%n", WIDTH + 3 * LEAD / 2, y + STEP/2);
+                System.out.println("width=" + outPin.width);
+            }
             System.out.println("}");
             y -= BETWEEN_PINS;
         }
 
+        int x = LEAD + (WIDTH - (controlPins.size() - 1) * BETWEEN_PINS) / 2;
+        for (NumberedPin cPin : controlPins) {
+            System.out.printf("P %d %d %d %d 1 0 0%n",
+                    x, -LEAD, x, 0);
+            System.out.println("{");
+            System.out.printf("T %d %d 9 8 1 1 90 6 1%n", x, STEP/2);
+            System.out.println("pinnumber=" + cPin.pin);
+            System.out.printf("T %d %d 5 9 0 1 90 8 1%n", x, STEP / 2);
+            System.out.println("pintype=in");
+            if (cPin.width != 1) {
+                System.out.printf("T %d %d 10 5 1 1 90 1 1%n", x - STEP / 2, -LEAD / 2);
+                System.out.println("width=" + cPin.width);
+            }
+            System.out.println("}");
+            x -= BETWEEN_PINS;
+        }
+
         System.out.printf("T %d %d 9 10 1 1 0 0 1%n", LEAD + STEP/2, height + STEP / 2);
-        System.out.println("device=" + new File(in).getName().replaceAll("\\.net$", ""));
+        System.out.println("device=" + new File(in).getName().replaceAll("\\..*$", ""));
         System.out.printf("T %d %d 9 10 1 1 0 6 1%n", WIDTH + LEAD - STEP/2, height + STEP / 2);
         System.out.println("refdes=U?");
 
@@ -89,6 +110,7 @@ public class SymbolMaker {
                 } else if ("IPAD".equals(component.getDevice())) {
                     inPins.add(e);
                 } else {
+                    // IO and O pins go on same side.
                     outPins.add(e);
                 }
             }

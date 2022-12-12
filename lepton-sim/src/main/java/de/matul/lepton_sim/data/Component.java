@@ -1,5 +1,6 @@
 package de.matul.lepton_sim.data;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,5 +35,15 @@ public class Component {
 
     public int getWidth() {
         return Integer.parseInt(attributes.getOrDefault("width", "1"));
+    }
+
+    public Map<String, String> allAttributes() {
+        return Collections.unmodifiableMap(attributes);
+    }
+
+    public Component addPrefix(String prefix) {
+        Component result = new Component(prefix + "." + name);
+        result.attributes = new HashMap(attributes);
+        return result;
     }
 }

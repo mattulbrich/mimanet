@@ -1,0 +1,60 @@
+<#assign pinseq = 1>
+#### IPADs
+<#list toList(parallel_IN) as c>
+Component ${c}
+  .device=IPAD
+  .width=${n}
+  .pinseq=${pinseq} <#assign pinseq++>
+
+<#list 0..toInt(n)-1 as i>
+Component BT_${c}_${i}
+  .device=BUSTAP
+  .spec=${i}
+</#list>
+
+Net bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
+
+</#list>
+
+#### OPADs
+<#list toList(parallel_OUT) as c>
+Component ${c}
+  .device=OPAD
+  .width=${n}
+  .pinseq=${pinseq} <#assign pinseq++>
+
+<#list 0..toInt(n)-1 as i>
+Component BT_${c}_${i}
+  .device=BUSTAP
+  .spec=${i}
+</#list>
+
+Net bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
+
+</#list>
+
+#### Control pads
+<#list toList(controls) as c>
+Component ${c}
+  .device=IPAD
+  .pintype=control
+  .pinseq=${pinseq} <#assign pinseq++>
+  
+</#list>
+
+#### The components and the connections
+<#list 0..toInt(n)-1 as i>
+Component U${i}
+  .device=${component}
+
+<#list toList(parallel_IN) as c>
+Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
+</#list>
+<#list toList(parallel_OUT) as c>
+Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
+</#list>
+
+</#list>
+<#list toList(controls) as c>
+Net net_${c}: ${c} IPAD<#list 0..toInt(n)-1 as i>, U${i} ${c}</#list>
+</#list>

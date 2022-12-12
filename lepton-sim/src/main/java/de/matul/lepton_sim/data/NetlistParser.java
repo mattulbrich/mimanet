@@ -2,6 +2,7 @@ package de.matul.lepton_sim.data;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +16,23 @@ public class NetlistParser {
 
         Component curComponent = null;
         for (String line : lines) {
+            if(line.trim().length() == 0 || line.trim().startsWith("#")) {
+                continue;
+            }
+
             if(line.startsWith("Component ")) {
                 curComponent = new Component(line.substring(10));
                 components.add(curComponent);
             } else if (line.startsWith("Net ")) {
                 String[] parts = line.split(":");
                 String name = parts[0].substring(4).trim();
-                String[] pins = parts[1].trim().split(" ");
+                String[] pins = parts[1].trim().split(" *, *");
                 nets.add(new Net(name, new ArrayList<>(Arrays.asList(pins))));
             } else if (line.startsWith("  .")) {
                 String[] parts = line.substring(3).split("=");
                 curComponent.putAttribute(parts[0].trim(), parts[1].trim());
+            } else {
+                System.err.println("Illegal line " + line);
             }
         }
 
@@ -33,6 +40,10 @@ public class NetlistParser {
     }
 
     public static Netlist parseFile(String file) throws IOException {
-        return parse(Files.readAllLines(Paths.get(file)));
+        return parseFile(Paths.get(file));
+    }
+
+    public static Netlist parseFile(Path libPath) throws IOException {
+        return parse(Files.readAllLines(libPath));
     }
 }

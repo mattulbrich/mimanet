@@ -1,0 +1,23 @@
+Component IN
+  .device=IPAD
+  .width=${n}
+  .pinseq=1
+  
+<#list 0..toInt(n)-1 as i>
+Component OUT${i}
+  .device=OPAD
+  .width=1
+  .pinseq=${i+2}
+  
+Component BT${i}
+  .device=BUSTAP
+  .spec=${i}
+  
+Net btnet${i}: BT${i} tapped, OUT${i} OPAD
+
+</#list>
+
+Net btbus: IN IPAD<#list 0..toInt(n)-1 as i>, BT${i} bus</#list>
+
+
+  

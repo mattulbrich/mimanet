@@ -1,21 +1,33 @@
 jar=lepton-sim/build/libs/lepton-sim-1.0-all.jar
+tool=java -jar ${jar}
 
-LIB_SCH=$(wildcard lib/*.sch)
-LIB_SYM=$(patsubst %.sch,%.sym,$(wildcard lib/*.sch))
-SYM_SYM=$(patsubst %.sch, %.sym, $(wildcard sym/*.sch))
+SYM_SCH=$(wildcard sym/*.sch)
+SYM_SYM=$(patsubst %.sch, %.sym, $(wildcard sym/*.sch)) $(patsubst %.net, %.sym, $(wildcard sym/*.net))
 SYM_NET=$(patsubst %.sch, %.net, $(wildcard sym/*.sch))
+SYM_SYMNET=$(patsubst %.sch, %.symnet, $(wildcard sym/*.sch))
+SYM_NET_PROP=$(patsubst %.props, %.net, $(wildcard sym/*.props))
+SYM_SYM_PROP=$(patsubst %.props, %.sym, $(wildcard sym/*.props))
 
-all: $(LIB_SYM) $(SYM_SYM) $(SYM_NET)
+all: $(SYM_SYM) $(SYM_NET) $(SYM_NET_PROP) $(SYM_SYM_PROP) Makefile.dependencies
 
 jar:
 	cd lepton-sim ; ./gradlew shadowJar
 
-%.net : %.sch
+%.symnet : %.sch 
 	lepton-netlist -g mu $< -o $@
 
-%.sym : %.net $(SYM_NET) 
-	java -jar $(jar) sym $< > $@
+%.net : %.sch $(SYM_SYM)
+	lepton-netlist -g mu $< -o $@
 
-clean: 
-	rm -f $(wildcard lib/*.net) $(LIB_SYM)
-	rm -f $(wildcard sym/*.net) $(wildcard sym/*.sym)
+%.sym : %.symnet 
+	$(tool) sym $< > $@
+
+clean:
+	rm -f $(wildcard sym/*.net) $(wildcard sym/*.symnet) $(wildcard sym/*.sym)
+
+%.net: %.props
+	${tool} expand $< > $@
+
+%.sym: %.net %.props
+	$(tool) sym $< > $@
+
