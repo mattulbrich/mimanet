@@ -3,4 +3,4 @@ n = 24
 component = DRIVER
 parallel_IN = IN
 parallel_OUT = OUT
-controls = ENABLE
+controls = EN

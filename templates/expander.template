@@ -1,0 +1,18 @@
+Component BUS
+  .device = IPAD
+  .width = ${n}
+  .pinseq = 1
+
+<#list 0 .. toInt(n)-1 as i>
+Component P${i}
+  .device = OPAD
+  .pinseq = ${i+1}
+
+Component BT${i}
+  .device = BUSTAP
+  .spec = ${i}
+
+Net n${i}: BT${i} tapped, P${i} OPAD
+
+</#list>
+Net bus: BUS IPAD<#list 0 .. toInt(n)-1 as i>, BT{i} bus</#list>

@@ -1,5 +1,5 @@
 template = parallel
-n = 24
+n = 20
 component = D_FF
 parallel_IN = DIN
 parallel_OUT = Q, Q_N

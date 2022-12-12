@@ -81,12 +81,12 @@ public class SymbolMaker {
             System.out.printf("P %d %d %d %d 1 0 0%n",
                     x, -LEAD, x, 0);
             System.out.println("{");
-            System.out.printf("T %d %d 9 8 1 1 90 6 1%n", x, STEP/2);
+            System.out.printf("T %d %d 9 8 1 1 90 1 1%n", x, STEP/2);
             System.out.println("pinnumber=" + cPin.pin);
             System.out.printf("T %d %d 5 9 0 1 90 8 1%n", x, STEP / 2);
             System.out.println("pintype=in");
             if (cPin.width != 1) {
-                System.out.printf("T %d %d 10 5 1 1 90 1 1%n", x - STEP / 2, -LEAD / 2);
+                System.out.printf("T %d %d 10 5 1 1 90 3 1%n", x - STEP / 2, -LEAD / 2);
                 System.out.println("width=" + cPin.width);
             }
             System.out.println("}");
