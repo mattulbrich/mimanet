@@ -25,9 +25,9 @@ public class NetlistParser {
                 components.add(curComponent);
             } else if (line.startsWith("Net ")) {
                 String[] parts = line.split(":");
-                String name = parts[0].substring(4).trim();
+                String[] names = parts[0].substring(4).trim().split(" *, *");
                 String[] pins = parts[1].trim().split(" *, *");
-                nets.add(new Net(name, new ArrayList<>(Arrays.asList(pins))));
+                nets.add(new Net(names, new ArrayList<>(Arrays.asList(pins))));
             } else if (line.startsWith("  .")) {
                 String[] parts = line.substring(3).split("=");
                 curComponent.putAttribute(parts[0].trim(), parts[1].trim());

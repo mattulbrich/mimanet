@@ -26,7 +26,7 @@ public class Netlist {
             }
         }
         for (Net net : nets) {
-            System.out.println("Net " + net.getName() + " : " +
+            System.out.println("Net " + String.join(", ", net.getNames()) + " : " +
                 String.join(", ", net.getConnectedPins()));
         }
     }

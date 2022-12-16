@@ -5,7 +5,7 @@ C 44400 47400 1 0 0 NAND.sym
 T 44750 48150 5 10 1 1 0 0 1
 device=NAND
 T 45950 48150 5 10 1 1 0 6 1
-refdes=U?
+refdes=U1
 }
 C 42900 47800 1 0 0 IPAD.sym
 {
