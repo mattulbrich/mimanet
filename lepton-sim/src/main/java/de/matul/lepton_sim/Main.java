@@ -1,15 +1,9 @@
 package de.matul.lepton_sim;
 
-import com.sun.source.doctree.InlineTagTree;
-import de.matul.lepton_sim.data.Component;
 import de.matul.lepton_sim.data.Netlist;
 import de.matul.lepton_sim.data.NetlistParser;
 
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class Main {
 
@@ -26,14 +20,26 @@ public class Main {
                     netList.print(System.out);
                     break;
 
+                case "widthcheck":
+                    WidthChecker wChecker = new WidthChecker();
+                    wChecker.checkWidths(args);
+                    break;
+
                 case "inline":
                     Inliner inliner = new Inliner();
                     inliner.inline(args[1]).print(System.out);
                     break;
 
                 case "expand":
-                    Expander expander = new Expander();
-                    expander.expand(args);
+                    Netlist netlist = NetlistParser.parseFile(args[1]);
+                    new WidthChecker().checkWidth(netlist);
+                    BusExpander expander = new BusExpander();
+                    expander.expand(netlist).print(System.out);
+                    break;
+
+                case "compile":
+                    NetlistCompiler compiler = new NetlistCompiler();
+                    compiler.expand(args);
                     break;
 
                 default:

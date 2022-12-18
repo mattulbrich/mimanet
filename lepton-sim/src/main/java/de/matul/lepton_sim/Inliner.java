@@ -26,7 +26,7 @@ public class Inliner {
     private final ArrayList<Component> components = new ArrayList<>();
     private final ArrayList<Net> nets = new ArrayList<>();
 
-    private Map<String, Netlist> library = new HashMap<>();
+
 
     public Netlist inline(String filename) throws IOException {
         Netlist netlist = NetlistParser.parseFile(filename);
@@ -95,7 +95,7 @@ public class Inliner {
                 components.add(component);
                 continue;
             }
-            Netlist compNetlist = getLibNetlist(component.getDevice());
+            Netlist compNetlist = Library.getLibNetlist(component.getDevice());
             if (compNetlist.isImplementation()) {
                 // pass thru implementations
                 components.add(component);
@@ -107,26 +107,4 @@ public class Inliner {
         }
     }
 
-    private Netlist getLibNetlist(String device) throws IOException {
-        Netlist cached = library.get(device);
-        if (cached != null) {
-            return cached;
-        }
-
-        Path libPath = Paths.get("lib", device + ".net");
-        if(Files.isReadable(libPath)) {
-            Netlist netlist = NetlistParser.parseFile(libPath);
-            library.put(device, netlist);
-            return netlist;
-        }
-
-        Path symPath = Paths.get("sym", device + ".net");
-        if(Files.isReadable(symPath)) {
-            Netlist netlist = NetlistParser.parseFile(symPath);
-            library.put(device, netlist);
-            return netlist;
-        }
-
-        throw new IllegalArgumentException("Device " + device + " unknown.");
-    }
 }

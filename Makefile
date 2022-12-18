@@ -26,8 +26,10 @@ clean:
 	rm -f $(wildcard sym/*.net) $(wildcard sym/*.symnet) $(wildcard sym/*.sym)
 
 %.net: %.props
-	${tool} expand $< > $@
+	${tool} compile $< > $@
 
 %.sym: %.net %.props
 	$(tool) sym $< > $@
 
+tool:
+	echo 'export t="${tool}"'
