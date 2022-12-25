@@ -35,6 +35,7 @@ public class NetlistCompiler {
         cfg.setWrapUncheckedExceptions(true);
         cfg.setFallbackOnNullLoopVariable(false);
     }
+
     public void expand(String[] args) throws IOException, TemplateException {
 
         Properties p = new Properties();

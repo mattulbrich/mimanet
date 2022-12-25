@@ -2,6 +2,7 @@ package de.matul.lepton_sim;
 
 import de.matul.lepton_sim.data.Netlist;
 import de.matul.lepton_sim.data.NetlistParser;
+import de.matul.lepton_sim.sim.Simulator;
 
 import java.io.IOException;
 
@@ -41,6 +42,14 @@ public class Main {
                     NetlistCompiler compiler = new NetlistCompiler();
                     compiler.expand(args);
                     break;
+
+                case "simulate":
+                    inliner = new Inliner();
+                    netlist = inliner.inline(args[1]);
+                    new WidthChecker().checkWidth(netlist);
+                    netlist = new BusExpander().expand(netlist);
+                    Simulator simulator = new Simulator();
+                    simulator.simulate(netlist);
 
                 default:
                     System.err.println("No such command: ");

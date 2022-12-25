@@ -1,7 +1,10 @@
 package de.matul.lepton_sim.data;
 
+import de.matul.lepton_sim.sim.Simulator;
+
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -43,5 +46,20 @@ public class Netlist {
 
     public boolean isImplementation() {
         return components.stream().anyMatch(x -> x.getDevice().equals("IMPLEMENTATION"));
+    }
+
+    public List<Component> getPads() {
+        return getComponents().stream().
+                filter(x -> x.getDevice().matches("(I|O|IO)PAD")).
+                toList();
+    }
+
+    public Component getImplementation() {
+        for (Component component : components) {
+            if("IMPLEMENTATION".equals(component.getDevice())) {
+                return component;
+            }
+        }
+        return null;
     }
 }
