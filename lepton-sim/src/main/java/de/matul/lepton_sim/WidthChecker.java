@@ -72,8 +72,8 @@ public class WidthChecker {
                         if (width != w) {
                             widthMap.entrySet().forEach(System.out::println);
                             throw new IllegalArgumentException(
-                                    String.format("Inconsistent width %d and %d on %s",
-                                            width, w, net.getNames().get(0)));
+                                    String.format("Inconsistent width %d and %d on %s (%s)",
+                                            width, w, net.getNames().get(0), net));
                         }
                     }
                 }

@@ -40,4 +40,10 @@ public class Net {
     public void setWidth(int width) {
         this.width = width;
     }
+
+    @Override
+    public String toString() {
+        return String.join(", ", names) + ": " +
+                String.join(", ", connectedPins);
+    }
 }
