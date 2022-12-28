@@ -7,8 +7,9 @@ SYM_NET=$(patsubst %.sch, %.net, $(wildcard sym/*.sch))
 SYM_SYMNET=$(patsubst %.sch, %.symnet, $(wildcard sym/*.sch))
 SYM_NET_PROP=$(patsubst %.props, %.net, $(wildcard sym/*.props))
 SYM_SYM_PROP=$(patsubst %.props, %.sym, $(wildcard sym/*.props))
+JAVA_CLASS=$(patsubst %.java, %.class, $(wildcard sym/*.java))
 
-all: $(SYM_SYM) $(SYM_NET) $(SYM_NET_PROP) $(SYM_SYM_PROP) Makefile.dependencies
+all: $(SYM_SYM) $(SYM_NET) $(SYM_NET_PROP) $(SYM_SYM_PROP) $(JAVA_CLASS)
 
 jar:
 	cd lepton-sim ; ./gradlew shadowJar
@@ -23,7 +24,7 @@ jar:
 	$(tool) sym $< > $@
 
 clean:
-	rm -f $(wildcard sym/*.net) $(wildcard sym/*.symnet) $(wildcard sym/*.sym)
+	rm -f $(wildcard sym/*.net) $(wildcard sym/*.symnet) $(wildcard sym/*.sym) sym/*.class
 
 %.net: %.props
 	${tool} compile $< > $@
@@ -33,3 +34,12 @@ clean:
 
 tool:
 	echo 'export t="${tool}"'
+
+%.class: %.java
+	javac --release 11 -g -cp ${jar} $<
+
+test.json: all
+	$(tool) simulate sym/TEST.net test.json
+
+fakeClasses:
+	cp sym/*.java lepton-sim/src/main/java
