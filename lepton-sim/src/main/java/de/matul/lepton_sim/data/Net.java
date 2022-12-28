@@ -12,12 +12,12 @@ public class Net {
     private int width = -1;
 
     public Net(String[] name, List<String> connectedPins) {
-        this(new ArrayList<>(Arrays.asList(name)), connectedPins);
+        this(Arrays.asList(name), connectedPins);
     }
 
     public Net(List<String> names, List<String> connectedPins) {
-        this.names = names;
-        this.connectedPins = connectedPins;
+        this.names = new ArrayList<>(names);
+        this.connectedPins = new ArrayList<>(connectedPins);
     }
 
     public List<String> getNames() {

@@ -16,7 +16,7 @@ public class WidthChecker {
         String filename = args[1];
         Netlist netlist = NetlistParser.parseFile(filename);
         checkWidth(netlist);
-        netlist.print(System.out);
+        // netlist.print(System.out);
     }
 
     public void checkWidth(Netlist netlist) throws IOException {
@@ -35,6 +35,11 @@ public class WidthChecker {
                     widthMap.put(component.getName() + " bus", max(spec));
                 }
 
+                case "IMPLEMENTATION" -> {
+                    System.out.println("Implementation detected");
+                    return;
+                }
+
                 default -> {
                     for (Component c : Library.getLibNetlist(component.getDevice()).getComponents()) {
                         if (c.getDevice().matches("(I|O|IO)PAD")) {
@@ -49,9 +54,14 @@ public class WidthChecker {
             int width = -1;
             int max = 0;
             for (String connectedPin : net.getConnectedPins()) {
-                Integer w = widthMap.get(connectedPin);
-                if(w == null) {
-                    throw new NoSuchElementException("No width on pin " + connectedPin);
+                Integer w;
+                if (connectedPin.contains("#")) {
+                    w = 1;
+                } else {
+                    w = widthMap.get(connectedPin);
+                    if (w == null) {
+                        throw new NoSuchElementException("No width on pin " + connectedPin);
+                    }
                 }
                 if(connectedPin.endsWith(" bus")) {
                     max = Math.max(w, max);

@@ -30,9 +30,9 @@ public class Inliner {
 
     public Netlist inline(String filename) throws IOException {
         Netlist netlist = NetlistParser.parseFile(filename);
-        netlist.print(System.out);
+        // netlist.print(System.out);
         inlineComponents(netlist);
-        new Netlist(components, nets).print(System.out);
+        // new Netlist(components, nets).print(System.out);
         resolveNets();
         return new Netlist(components, nets);
     }
@@ -51,7 +51,8 @@ public class Inliner {
                         String counter = m.group(1) + " " + m.group(2);
                         Net other = findNet(counter);
                         if (other == null) {
-                            throw new RuntimeException("Missing pin: " + counter);
+                            System.err.println("Unconnected pin: " + counter);
+                            continue;
                         }
                         other.getConnectedPins().remove(counter);
                         net.getConnectedPins().stream().

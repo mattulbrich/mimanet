@@ -3,12 +3,10 @@ package de.matul.lepton_sim;
 import de.matul.lepton_sim.data.Component;
 import de.matul.lepton_sim.data.Net;
 import de.matul.lepton_sim.data.Netlist;
-import de.matul.lepton_sim.data.NetlistParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +63,8 @@ public class BusExpander {
                         String toFind = String.format("%s bus#%d", m.group(1), tap);
                         Net other = findNet(nets, toFind);
                         if (other == null) {
-                            throw new RuntimeException("Missing pin: " + toFind);
+                            System.err.println("Unconnected pin: " + toFind);
+                            continue;
                         }
                         net.getConnectedPins().remove(pin);
                         other.getConnectedPins().addAll(net.getConnectedPins());

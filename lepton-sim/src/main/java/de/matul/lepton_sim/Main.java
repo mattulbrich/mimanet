@@ -51,15 +51,32 @@ public class Main {
                     break;
 
                 case "simulate":
+
                     inliner = new Inliner();
                     netlist = inliner.inline(args[1]);
-                    new WidthChecker().checkWidth(netlist);
-                    netlist = new BusExpander().expand(netlist);
-                    Simulator simulator = new Simulator();
-                    simulator.simulate(netlist);
-                    simulator.print();
+                    try {
+                        new WidthChecker().checkWidth(netlist);
+                        netlist = new BusExpander().expand(netlist);
+                        Simulator simulator = new Simulator();
+                        simulator.simulate(netlist);
+                        simulator.print();
+                        if (args.length > 2) {
+                            simulator.printTo(args[2]);
+                        }
+                    } catch(Exception ex) {
+                        System.err.println("Problematic netlist: ");
+                        netlist.print(System.err);
+                        throw ex;
+                    }
+                    break;
+
+                case "graphviz":
+                    Graphvizer gv = new Graphvizer();
+                    gv.visualize(args[1]);
                     if (args.length > 2) {
-                        simulator.printTo(args[2]);
+                        Files.writeString(Paths.get(args[2]), gv.getGraph());
+                    } else {
+                        System.out.println(gv.getGraph());
                     }
                     break;
 
