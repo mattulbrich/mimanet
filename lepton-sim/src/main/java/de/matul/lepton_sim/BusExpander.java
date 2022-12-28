@@ -6,6 +6,7 @@ import de.matul.lepton_sim.data.Netlist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,10 +31,11 @@ public class BusExpander {
         }
 
         // resolve the "tapped" bus tap ports
-        resolveTaps(netlist.getComponents(), newNets);
+        List<Component> components = new ArrayList<>(netlist.getComponents());
+        resolveTaps(components, newNets);
         removeBuses(newNets);
 
-        return new Netlist(netlist.getComponents(), newNets);
+        return new Netlist(components, newNets);
     }
 
     private void removeBuses(ArrayList<Net> nets) {
@@ -42,9 +44,11 @@ public class BusExpander {
 
     private void resolveTaps(List<Component> components, ArrayList<Net> nets) {
         var specMap = new HashMap<String, int[]>();
-        for (Component component : components) {
+        for (Iterator<Component> it = components.iterator(); it.hasNext(); ) {
+            Component component = it.next();
             if (component.getDevice().equals("BUSTAP")) {
                 specMap.put(component.getName(), component.expandSpec());
+                it.remove();
             }
         }
 
@@ -60,13 +64,13 @@ public class BusExpander {
                         int[] spec = specMap.get(m.group(1));
                         int index = Integer.parseInt(m.group(2));
                         int tap = spec[index];
+                        net.getConnectedPins().remove(pin);
                         String toFind = String.format("%s bus#%d", m.group(1), tap);
                         Net other = findNet(nets, toFind);
                         if (other == null) {
                             System.err.println("Unconnected pin: " + toFind);
-                            continue;
+                            break;
                         }
-                        net.getConnectedPins().remove(pin);
                         other.getConnectedPins().addAll(net.getConnectedPins());
                         other.getNames().addAll(net.getNames());
                         it.remove();

@@ -57,8 +57,6 @@ public class Simulator {
             }
             recorder.recordPins(allPins);
         }
-
-
     }
 
     private void buildEnv(Netlist netlist) throws Exception {
@@ -72,6 +70,9 @@ public class Simulator {
             for (String connectedPin : net.getConnectedPins()) {
                 connectedPin = connectedPin.replace(' ', '.');
                 Pin pin = allPins.get(connectedPin);
+                if (pin == null) {
+                    throw new NoSuchElementException(connectedPin);
+                }
                 simNet.addPin(pin);
                 pin.setNet(simNet);
             }
