@@ -29,7 +29,7 @@ Component BT_${c}_${i}
   .spec=${i}
 </#list>
 
-Net bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
+Net bus_${c}: ${c} OPAD<#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
 
 </#list>
 
@@ -76,6 +76,6 @@ Net net_${c}: ${c} IPAD<#list 0..toInt(n)-1 as i>, U${i} ${c}</#list>
 </#list>
 
 <#list toList(cascaded) as c><#assign fromTo=toPair(c)>
-Net in_${fromTo.to}: ${fromTo.to} IPAD, U1 ${fromTo.to}
+Net in_${fromTo.to}: ${fromTo.to} IPAD, U0 ${fromTo.to}
 Net out_${fromTo.from}: ${fromTo.from} OPAD, U${toInt(n)-1} ${fromTo.from}
 </#list>

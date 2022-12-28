@@ -14,6 +14,9 @@ all: $(SYM_SYM) $(SYM_NET) $(SYM_NET_PROP) $(SYM_SYM_PROP) $(JAVA_CLASS)
 jar:
 	cd lepton-sim ; ./gradlew shadowJar
 
+check: $(SYM_NET) $(SYM_NET_PROP)
+	for x in sym/*.net; do echo "Check $$x:" ; $(tool) widthcheck $$x || exit; done
+
 %.symnet : %.sch 
 	lepton-netlist -g mu $< -o $@
 
