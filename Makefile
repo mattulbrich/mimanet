@@ -27,7 +27,7 @@ clean:
 	rm -f $(wildcard sym/*.net) $(wildcard sym/*.symnet) $(wildcard sym/*.sym) sym/*.class
 
 %.net: %.props
-	${tool} compile $< > $@
+	${tool} compile $< $@
 
 %.sym: %.net %.props
 	$(tool) sym $< > $@

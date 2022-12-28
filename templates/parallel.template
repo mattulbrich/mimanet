@@ -33,6 +33,17 @@ Net bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
 
 </#list>
 
+#### Cascaded pads
+<#list toList(cascaded) as c><#assign fromTo=toPair(c)>
+Component ${fromTo.to}
+  .device=IPAD
+  .pinseq=${pinseq} <#assign pinseq++>
+
+Component ${fromTo.from}
+  .device=OPAD
+  .pinseq=${pinseq} <#assign pinseq++>
+</#list>
+
 #### Control pads
 <#list toList(controls) as c>
 Component ${c}
@@ -53,8 +64,18 @@ Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
 <#list toList(parallel_OUT) as c>
 Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
 </#list>
+<#if i != 0>
+<#list toList(cascaded) as c><#assign fromTo=toPair(c)>
+Net ${fromTo.from}_${fromTo.to}_${i}: U${i-1} ${fromTo.from}, U${i} ${fromTo.to}
+</#list>
+</#if>
 
 </#list>
 <#list toList(controls) as c>
 Net net_${c}: ${c} IPAD<#list 0..toInt(n)-1 as i>, U${i} ${c}</#list>
+</#list>
+
+<#list toList(cascaded) as c><#assign fromTo=toPair(c)>
+Net in_${fromTo.to}: ${fromTo.to} IPAD, U1 ${fromTo.to}
+Net out_${fromTo.from}: ${fromTo.from} OPAD, U${toInt(n)-1} ${fromTo.from}
 </#list>

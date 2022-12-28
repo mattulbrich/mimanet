@@ -5,6 +5,8 @@ import de.matul.lepton_sim.data.NetlistParser;
 import de.matul.lepton_sim.sim.Simulator;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Main {
 
@@ -40,7 +42,12 @@ public class Main {
 
                 case "compile":
                     NetlistCompiler compiler = new NetlistCompiler();
-                    compiler.expand(args);
+                    String compilation = compiler.expand(args);
+                    if (args.length > 2) {
+                        Files.writeString(Paths.get(args[2]), compilation);
+                    } else {
+                        System.out.println(compilation);
+                    }
                     break;
 
                 case "simulate":

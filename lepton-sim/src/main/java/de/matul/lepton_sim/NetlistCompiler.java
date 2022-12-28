@@ -9,10 +9,12 @@ import freemarker.template.TemplateMethodModelEx;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,7 +38,7 @@ public class NetlistCompiler {
         cfg.setFallbackOnNullLoopVariable(false);
     }
 
-    public void expand(String[] args) throws IOException, TemplateException {
+    public String expand(String[] args) throws IOException, TemplateException {
 
         Properties p = new Properties();
         p.load(new FileReader(args[1]));
@@ -46,13 +48,45 @@ public class NetlistCompiler {
         /* Create a data-model */
         Map<Object, Object> root = new HashMap<>(p);
         root.put("toInt", (TemplateMethodModelEx) arguments -> Integer.parseInt(arguments.get(0).toString()));
-        root.put("toList", (TemplateMethodModelEx) arguments -> Arrays.asList(arguments.get(0).toString().split(" *, *")));
+        root.put("toList", (TemplateMethodModelEx) this::toList);
+        root.put("toPair", (TemplateMethodModelEx) arguments -> new Pair(arguments.get(0).toString()));
 
         /* Merge data-model with template */
-        Writer out = new OutputStreamWriter(System.out);
+        Writer out = new StringWriter();
         temp.process(root, out);
-
         // Note: Depending on what `out` is, you may need to call `out.close()`.
         // This is usually the case for file output, but not for servlet output.
+
+        return out.toString();
+    }
+
+    private List<String> toList(List<?> arguments) {
+        if (arguments == null || arguments.size() != 1) {
+            throw new RuntimeException("Expected exactly one argument");
+        }
+        if (arguments.get(0) == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(arguments.get(0).toString().split(" *, *"));
+    }
+
+    public static final class Pair {
+        public final String from;
+
+        public final String to;
+
+        Pair(String s) {
+            String[] parts = s.split(" *-> *");
+            this.from = parts[0];
+            this.to = parts[1];
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public String getTo() {
+            return to;
+        }
     }
 }
