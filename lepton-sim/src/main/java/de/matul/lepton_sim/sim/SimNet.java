@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SimNet {
 
-    private List<Pin> allPins = new ArrayList<>();
+    private final List<Pin> allPins = new ArrayList<>();
 
     private Signal lastSignal = Signal.ERROR;
 
@@ -18,6 +18,10 @@ public class SimNet {
         for (Pin pin : allPins) {
             s = s.merge(pin.getDriverSignal());
         }
+        if(s == lastSignal) {
+            return;
+        }
+        lastSignal = s;
         for (Pin pin : allPins) {
             pin.setNetSignal(sim, s);
         }

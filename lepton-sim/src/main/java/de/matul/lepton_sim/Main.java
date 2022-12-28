@@ -50,9 +50,14 @@ public class Main {
                     netlist = new BusExpander().expand(netlist);
                     Simulator simulator = new Simulator();
                     simulator.simulate(netlist);
+                    simulator.print();
+                    if (args.length > 2) {
+                        simulator.printTo(args[2]);
+                    }
+                    break;
 
                 default:
-                    System.err.println("No such command: ");
+                    System.err.println("No such command: " + args[0]);
                     System.exit(1);
             }
         } catch (Exception e) {

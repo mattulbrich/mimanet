@@ -36,6 +36,15 @@ public class Component {
         return attributes.get(attribute);
     }
 
+    public int getIntAttribute(String attribute, int defaultValue) {
+        String attr = getAttribute(attribute);
+        if (attr == null) {
+            return defaultValue;
+        } else {
+            return Integer.parseInt(attr);
+        }
+    }
+
     public int getWidth() {
         return Integer.parseInt(attributes.getOrDefault("width", "1"));
     }

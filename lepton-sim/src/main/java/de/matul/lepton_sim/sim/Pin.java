@@ -1,13 +1,24 @@
 package de.matul.lepton_sim.sim;
 
 public class Pin {
-    private Signal driverSignal;
-    private Signal netSignal;
+    private final String name;
+    private Signal driverSignal = Signal.ERROR;
+    private Signal netSignal = Signal.ERROR;
     private SimNet simNet;
     private SimComponent driver;
     private boolean driverReactsToSignal;
 
     public Pin(String name) {
+        // for debugging actually
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Pin{" + name + '\'' +
+                ", D=" + driverSignal +
+                ", N=" + netSignal +
+                '}';
     }
 
     public void setNet(SimNet simNet) {
@@ -42,6 +53,10 @@ public class Pin {
     public void setDriver(SimComponent driver, boolean driverReactsToSignal) {
         this.driver = driver;
         this.driverReactsToSignal = driverReactsToSignal;
+        if(driverReactsToSignal) {
+            // set this to 'Z' in case of pure input signals.
+            driverSignal = Signal.HIGH_IMP;
+        }
     }
 
     public SimComponent getDriver() {
