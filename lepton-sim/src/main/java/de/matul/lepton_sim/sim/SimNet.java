@@ -7,7 +7,13 @@ public class SimNet {
 
     private final List<Pin> allPins = new ArrayList<>();
 
+    private final String name;
+
     private Signal lastSignal = Signal.ERROR;
+
+    public SimNet(String name) {
+        this.name = name;
+    }
 
     public void addPin(Pin pin) {
         allPins.add(pin);
@@ -25,5 +31,9 @@ public class SimNet {
         for (Pin pin : allPins) {
             pin.setNetSignal(sim, s);
         }
+    }
+
+    public String getName() {
+        return name;
     }
 }

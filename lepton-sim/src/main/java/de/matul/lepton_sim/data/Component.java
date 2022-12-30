@@ -84,4 +84,12 @@ public class Component {
         }
         return result;
     }
+
+    public boolean isToplevel() {
+        return !name.contains(".");
+    }
+
+    public boolean isInlined() {
+        return "true".equals(getAttribute("inlined"));
+    }
 }

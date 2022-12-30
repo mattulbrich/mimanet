@@ -14,6 +14,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,9 +23,9 @@ import java.util.regex.Pattern;
 public class Inliner {
 
     private static Pattern PAD_PATTERN = Pattern.compile("(.*)\\.([^.]+) (I|IO|O)PAD");
-    private static final Set<String> PAD_DEVICES = Set.of("IPAD", "OPAD", "IOPAD");
-    private final ArrayList<Component> components = new ArrayList<>();
-    private final ArrayList<Net> nets = new ArrayList<>();
+    private static final Set<String> PAD_DEVICES = Set.of("IPAD", "OPAD", "IOPAD", "BUSTAP");
+    private final List<Component> components = new ArrayList<>();
+    private final List<Net> nets = new ArrayList<>();
 
 
 
@@ -45,21 +46,24 @@ public class Inliner {
 
             for (Iterator<Net> it = nets.iterator(); it.hasNext(); ) {
                 Net net = it.next();
-                for (String pin : net.getConnectedPins()) {
+                for (Iterator<String> pit = net.getConnectedPins().iterator(); pit.hasNext(); ) {
+                    String pin = pit.next();
                     Matcher m = PAD_PATTERN.matcher(pin);
                     if(m.matches()) {
                         String counter = m.group(1) + " " + m.group(2);
                         Net other = findNet(counter);
                         if (other == null) {
+                            pit.remove();
                             System.err.println("Unconnected pin: " + counter);
                             continue;
                         }
+                        it.remove();
                         other.getConnectedPins().remove(counter);
                         net.getConnectedPins().stream().
                                 filter(x -> !x.equals(pin)).
                                 forEach(other.getConnectedPins()::add);
                         other.getNames().addAll(net.getNames());
-                        it.remove();
+                        other.getNames().add(counter);
                         changed = true;
                         break;
                     }
@@ -78,30 +82,24 @@ public class Inliner {
     private void inlineComponents(Netlist netlist) throws IOException {
 
         // toplevel pads to components
-        netlist.getComponents().stream()
-                .filter(c -> PAD_DEVICES.contains(c.getDevice()))
-                .forEach(components::add);
-
         nets.addAll(netlist.getNets());
 
         Deque<Component> todo = new LinkedList<>(netlist.getComponents());
         while (!todo.isEmpty()) {
             Component component = todo.removeFirst();
             if(PAD_DEVICES.contains(component.getDevice())) {
-                // ignore pads ...
+                if (component.isToplevel()) {
+                    components.add(component);
+                }
                 continue;
             }
-            if (component.getDevice().equals("BUSTAP")) {
-                // pass thru bus tap
-                components.add(component);
-                continue;
-            }
+            components.add(component);
             Netlist compNetlist = Library.getLibNetlist(component.getDevice());
             if (compNetlist.isImplementation()) {
                 // pass thru implementations
-                components.add(component);
                 continue;
             }
+            component.putAttribute("inlined", "true");
             Netlist prefixed = compNetlist.addPrefix(component.getName());
             nets.addAll(prefixed.getNets());
             todo.addAll(prefixed.getComponents());

@@ -22,6 +22,8 @@ import java.util.NoSuchElementException;
 public class Simulator {
     private final Map<String, Pin> allPins = new LinkedHashMap<>();
 
+    private final List<SimNet> allNets = new ArrayList<>();
+
     private final ClassLoader localClassLoader;
     private Collection<SimComponent> queuedComponents = new LinkedHashSet<>();
     private List<TickReceiver> tickReceivers = new ArrayList<>();
@@ -39,7 +41,7 @@ public class Simulator {
     public void simulate(Netlist netlist) throws Exception {
         buildEnv(netlist);
         recorder.registerPins(allPins);
-        recorder.registerNets(netlist.getNets());
+        recorder.registerNet(netlist);
         runSimulation(1000);
     }
 
@@ -66,7 +68,7 @@ public class Simulator {
 
     private void buildNets(Netlist netlist) {
         for (Net net : netlist.getNets()) {
-            SimNet simNet = new SimNet();
+            SimNet simNet = new SimNet(net.getNames().get(0));
             for (String connectedPin : net.getConnectedPins()) {
                 connectedPin = connectedPin.replace(' ', '.');
                 Pin pin = allPins.get(connectedPin);
@@ -76,11 +78,15 @@ public class Simulator {
                 simNet.addPin(pin);
                 pin.setNet(simNet);
             }
+            allNets.add(simNet);
         }
     }
 
     private void buildComponents(Netlist netlist) throws Exception {
         for (Component component : netlist.getComponents()) {
+            if(component.isInlined()) {
+                continue;
+            }
             String name = component.getName();
             Netlist compnet = Library.getLibNetlist(component.getDevice());
             for (Component pad : compnet.getPads()) {

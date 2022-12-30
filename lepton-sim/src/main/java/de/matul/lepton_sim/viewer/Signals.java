@@ -11,10 +11,11 @@ public class Signals extends JComponent {
 
     private static final int PIN_HEIGHT = 60;
     private static final int MARGIN_Y = 10;
-    private static final int STEP_X = 30;
     private static final int NOT_SET = -4;
     private static final int SIGNAL_HEIGHT = PIN_HEIGHT - 2 * MARGIN_Y;
     private final Data data;
+
+    private int stepX = 30;
 
     public Signals(Data data) {
         this.data = data;
@@ -22,7 +23,13 @@ public class Signals extends JComponent {
     }
 
     public void recomputeSizeFromData() {
-        setPreferredSize(new Dimension(STEP_X * data.getTraceLength(), PIN_HEIGHT * data.countChannels()));
+        setPreferredSize(new Dimension(stepX * data.getTraceLength(), PIN_HEIGHT * data.countChannels()));
+    }
+
+    public void scaleX(double v) {
+        stepX = (int)Math.max(Math.min(stepX * v, 200.), 10.);
+        recomputeSizeFromData();
+        repaint();
     }
 
     private class RowHeader extends JComponent {
@@ -89,17 +96,17 @@ public class Signals extends JComponent {
                 if(value >= 0) {
                     g.setColor(Color.BLACK);
                     if (value != lastValue && lastValue >= 0) {
-                        g.drawLine(c * STEP_X, y + MARGIN_Y, c * STEP_X, y + SIGNAL_HEIGHT + MARGIN_Y);
+                        g.drawLine(c * stepX, y + MARGIN_Y, c * stepX, y + SIGNAL_HEIGHT + MARGIN_Y);
                     }
                     int lvl = y  + MARGIN_Y+ (1 - value) * SIGNAL_HEIGHT;
-                    g.drawLine(c * STEP_X, lvl, (c + 1) * STEP_X, lvl);
+                    g.drawLine(c * stepX, lvl, (c + 1) * stepX, lvl);
                 } else {
                     if(value == Data.HIGH_IMP) {
                         g.setColor(Color.lightGray);
                     } else {
                         g.setColor(Color.red.brighter());
                     }
-                    g.fillRect(c * STEP_X, y + MARGIN_Y, STEP_X, SIGNAL_HEIGHT);
+                    g.fillRect(c * stepX, y + MARGIN_Y, stepX, SIGNAL_HEIGHT);
                 }
                 lastValue = value;
             }

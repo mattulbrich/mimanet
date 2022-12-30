@@ -1,5 +1,9 @@
 package de.matul.lepton_sim.viewer;
 
+import de.matul.lepton_sim.data.Net;
+import de.matul.lepton_sim.data.Netlist;
+import de.matul.lepton_sim.data.NetlistParser;
+import de.matul.lepton_sim.sim.Recorder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,6 +24,8 @@ public class Data {
     public static final int MIXED = -3;
 
     private JSONObject rawData;
+
+    private Netlist netlist;
 
     private List<String> selectedChannels = new ArrayList<>();
 
@@ -43,19 +49,20 @@ public class Data {
 
     public void load(String filename) throws IOException {
         this.rawData = new JSONObject(Files.readString(Paths.get(filename)));
+        this.netlist = NetlistParser.parse(rawData.getString(Recorder.KEY_NETLIST));
         setSelectedChannels(
-                rawData.getJSONArray("pins").toList().
+                rawData.getJSONArray(Recorder.KEY_PINS).toList().
                         stream().map(Object::toString).toList());
     }
 
-    private void setSelectedChannels(List<String> pins) {
+    public void setSelectedChannels(List<String> pins) {
         this.selectedChannels = pins;
         resolveData();
     }
 
     private void resolveData() {
-        JSONArray trace = rawData.getJSONArray("log");
-        JSONArray allpins = rawData.getJSONArray("pins");
+        JSONArray trace = rawData.getJSONArray(Recorder.KEY_TRACE);
+        JSONArray allpins = rawData.getJSONArray(Recorder.KEY_PINS);
         Map<String, Integer> pinMap = new HashMap<>();
         for (int i = 0; i < allpins.length(); i++) {
             pinMap.put((String) allpins.get(i), i);
@@ -63,13 +70,54 @@ public class Data {
 
         int[][] values = new int[selectedChannels.size()][trace.length()];
         for (int i = 0; i < values.length; i++) {
-            int pinIndex = pinMap.get(selectedChannels.get(i));
-            for (int j = 0; j < values[i].length; j++) {
-                values[i][j] = toInt(((String) trace.get(j)).charAt(pinIndex));
+            String channel = selectedChannels.get(i);
+            if(pinMap.containsKey(channel)) {
+                int pinIndex = pinMap.get(channel);
+                for (int j = 0; j < values[i].length; j++) {
+                    values[i][j] = toInt(((String) trace.get(j)).charAt(pinIndex));
+                }
+            } else {
+                List<Integer> pinsForNet = resolveNetRef(pinMap, channel);
+                for (int j = 0; j < values[i].length; j++) {
+                    values[i][j] = resolveNetValue(pinsForNet, (String)trace.get(j));
+                }
             }
         }
 
         this.resolvedData = values;
+    }
+
+    private int resolveNetValue(List<Integer> pinsForNet, String values) {
+        int value = HIGH_IMP;
+        for (Integer pin : pinsForNet) {
+            int newVal = toInt(values.charAt(pin));
+            value = combineValues(value, newVal);
+        }
+        return value;
+    }
+
+    private int combineValues(int v1, int v2) {
+        if (v1 == HIGH_IMP) {
+            return v2;
+        }
+        if (v2 == HIGH_IMP) {
+            return v1;
+        }
+        if (v1 == v2) {
+            return v1;
+        }
+        return ERROR;
+    }
+
+    private List<Integer> resolveNetRef(Map<String, Integer> pinMap, String channel) {
+        for (Net net : netlist.getNets()) {
+            if(net.getNames().contains(channel)) {
+                return net.getConnectedPins().stream().
+                        map(x -> x.replace(' ', '.')).
+                        map(pinMap::get).toList();
+            }
+        }
+        throw new NoSuchElementException(channel);
     }
 
     public int getTraceLength() {
@@ -94,5 +142,17 @@ public class Data {
 
     public int countChannels() {
         return selectedChannels.size();
+    }
+
+    public JSONObject getRawData() {
+        return rawData;
+    }
+
+    public Netlist getNetlist() {
+        return netlist;
+    }
+
+    public List<String> getPins() {
+        return rawData.getJSONArray(Recorder.KEY_PINS).toList().stream().map(Object::toString).toList();
     }
 }

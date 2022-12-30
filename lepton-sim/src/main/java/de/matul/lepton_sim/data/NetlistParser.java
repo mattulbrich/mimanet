@@ -46,4 +46,8 @@ public class NetlistParser {
     public static Netlist parseFile(Path libPath) throws IOException {
         return parse(Files.readAllLines(libPath));
     }
+
+    public static Netlist parse(String string) {
+        return parse(Arrays.asList(string.split("\n")));
+    }
 }

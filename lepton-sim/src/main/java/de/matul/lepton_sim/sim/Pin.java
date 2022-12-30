@@ -66,4 +66,8 @@ public class Pin {
     public boolean isDriverReactsToSignal() {
         return driverReactsToSignal;
     }
+
+    public String getName() {
+        return name;
+    }
 }

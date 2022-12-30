@@ -2,7 +2,10 @@ package de.matul.lepton_sim.data;
 
 import de.matul.lepton_sim.sim.Simulator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,13 +26,13 @@ public class Netlist {
 
     public void print(PrintStream out) {
         for (Component component : components) {
-            System.out.println("Component " + component.getName());
+            out.println("Component " + component.getName());
             for (Entry<String, String> entry : component.allAttributes().entrySet()) {
-                System.out.println("  ." + entry.getKey() + " = " + entry.getValue());
+               out.println("  ." + entry.getKey() + " = " + entry.getValue());
             }
         }
         for (Net net : nets) {
-            System.out.println("Net " + String.join(", ", net.getNames()) + " : " +
+            out.println("Net " + String.join(", ", net.getNames()) + " : " +
                 String.join(", ", net.getConnectedPins()));
         }
     }
@@ -61,5 +64,11 @@ public class Netlist {
             }
         }
         return null;
+    }
+
+    public String makeString() {
+        ByteArrayOutputStream w = new ByteArrayOutputStream();
+        print(new PrintStream(w));
+        return w.toString();
     }
 }
