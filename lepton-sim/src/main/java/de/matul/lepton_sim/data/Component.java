@@ -92,4 +92,9 @@ public class Component {
     public boolean isInlined() {
         return "true".equals(getAttribute("inlined"));
     }
+
+    @Override
+    public String toString() {
+        return name + " (" + getDevice() + ")";
+    }
 }

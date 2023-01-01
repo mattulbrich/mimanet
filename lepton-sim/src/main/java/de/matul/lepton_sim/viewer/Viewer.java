@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 public class Viewer extends JFrame {
 
@@ -42,9 +44,17 @@ public class Viewer extends JFrame {
         b = new JButton("Reload");
         b.addActionListener(this::reload);
         result.add(b);
+        result.addSeparator();
         b = new JButton("Select channels");
         b.addActionListener(this::selectChannels);
         result.add(b);
+        b = new JButton("Save channel list");
+        b.addActionListener(this::saveChannelList);
+        result.add(b);
+        b = new JButton("Load channel list");
+        b.addActionListener(this::loadChannelList);
+        result.add(b);
+        result.addSeparator();
         b = new JButton("Zoom in");
         b.addActionListener(this::zoomIn);
         result.add(b);
@@ -52,6 +62,36 @@ public class Viewer extends JFrame {
         b.addActionListener(this::zoomOut);
         result.add(b);
         return result;
+    }
+
+    private void loadChannelList(ActionEvent actionEvent) {
+        JFileChooser jfc = new JFileChooser(".");
+        int answer = jfc.showOpenDialog(this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            try {
+                List<String> lines = Files.readAllLines(jfc.getSelectedFile().toPath());
+                data.setSelectedChannels(lines);
+                signals.recomputeSizeFromData();
+                repaint();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void saveChannelList(ActionEvent actionEvent) {
+        JFileChooser jfc = new JFileChooser(".");
+        int answer = jfc.showSaveDialog(this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            try {
+                Files.write(jfc.getSelectedFile().toPath(),
+                        data.getSelectedChannels());
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 
     private void selectChannels(ActionEvent actionEvent) {

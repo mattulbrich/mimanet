@@ -1,0 +1,25 @@
+v 20210731 2
+C 40000 40000 0 0 0 title-B.sym
+C 43400 47300 1 0 0 IMPLEMENTATION.sym
+{
+T 44900 48000 5 10 1 1 0 5 1
+device=IMPLEMENTATION
+T 46350 48150 5 10 1 1 0 6 1
+refdes=IMPL
+T 43500 47450 5 10 1 0 0 0 1
+class=ResetSender
+}
+C 47000 47600 1 0 0 OPAD.sym
+{
+T 47302 47818 5 10 0 1 0 0 1
+device=OPAD
+T 47302 47635 5 10 1 1 0 0 1
+refdes=R
+T 47292 47492 5 6 1 1 0 0 1
+pinseq=0
+T 47125 47725 5 6 1 1 0 3 1
+width=1
+}
+T 43500 46800 9 10 1 0 0 0 2
+spec=...cycles where 1
+

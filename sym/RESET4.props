@@ -1,0 +1,6 @@
+template=parallel
+n=4
+component=RESET
+parallel_IN=P
+parallel_OUT=Q
+controls=R

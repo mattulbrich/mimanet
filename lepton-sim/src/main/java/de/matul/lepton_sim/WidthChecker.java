@@ -32,7 +32,7 @@ public class WidthChecker {
                 case "BUSTAP" -> {
                     int[] spec = component.expandSpec();
                     widthMap.put(component.getName() + " tapped", spec.length);
-                    widthMap.put(component.getName() + " bus", max(spec));
+                    widthMap.put(component.getName() + " bus", max(spec) + 1);
                 }
 
                 case "IMPLEMENTATION" -> {

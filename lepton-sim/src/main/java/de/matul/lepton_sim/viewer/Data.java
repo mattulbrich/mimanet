@@ -7,6 +7,7 @@ import de.matul.lepton_sim.sim.Recorder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -51,13 +52,21 @@ public class Data {
         this.rawData = new JSONObject(Files.readString(Paths.get(filename)));
         this.netlist = NetlistParser.parse(rawData.getString(Recorder.KEY_NETLIST));
         setSelectedChannels(
-                rawData.getJSONArray(Recorder.KEY_PINS).toList().
-                        stream().map(Object::toString).toList());
+                netlist.getNets().stream().flatMap(x->x.getNames().stream()).
+                        filter(x -> !x.contains("unnamed_net") && !x.contains(" "))
+                        .toList());
     }
 
     public void setSelectedChannels(List<String> pins) {
-        this.selectedChannels = pins;
-        resolveData();
+        List<String> oldSelection = this.selectedChannels;
+        try {
+            this.selectedChannels = pins;
+            resolveData();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Cannot set channels!");
+            this.selectedChannels = oldSelection;
+        }
     }
 
     private void resolveData() {

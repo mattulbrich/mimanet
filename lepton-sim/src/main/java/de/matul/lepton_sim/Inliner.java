@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class Inliner {
 
     private static Pattern PAD_PATTERN = Pattern.compile("(.*)\\.([^.]+) (I|IO|O)PAD");
-    private static final Set<String> PAD_DEVICES = Set.of("IPAD", "OPAD", "IOPAD", "BUSTAP");
+    private static final Set<String> PAD_DEVICES = Set.of("IPAD", "OPAD", "IOPAD");
     private final List<Component> components = new ArrayList<>();
     private final List<Net> nets = new ArrayList<>();
 
@@ -91,6 +91,10 @@ public class Inliner {
                 if (component.isToplevel()) {
                     components.add(component);
                 }
+                continue;
+            }
+            if (component.getDevice().equals("BUSTAP")) {
+                components.add(component);
                 continue;
             }
             components.add(component);

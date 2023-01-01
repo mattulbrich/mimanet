@@ -1,0 +1,6 @@
+template = parallel
+n = 20
+component = DRIVER
+parallel_IN = IN
+parallel_OUT = OUT
+controls = EN
