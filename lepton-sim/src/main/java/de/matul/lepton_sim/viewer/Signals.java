@@ -9,9 +9,12 @@ public class Signals extends JComponent {
 
     private static final Color LIGHTEST_GRAY = new Color(0xf0f0f0);
 
+    private static final Font FONT = new Font(Font.MONOSPACED, Font.BOLD, 16);
+
     private static final int PIN_HEIGHT = 60;
     private static final int MARGIN_Y = 10;
     private static final int NOT_SET = -4;
+    private static final int SLOPE_LEN = 8;
     private static final int SIGNAL_HEIGHT = PIN_HEIGHT - 2 * MARGIN_Y;
     private final Data data;
 
@@ -83,34 +86,114 @@ public class Signals extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
-        ((Graphics2D)g).setStroke(new BasicStroke(2f));
+        Graphics2D graphics2D = (Graphics2D) g;
+        graphics2D.setStroke(new BasicStroke(2f));
+
+        //Set  anti-alias!
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Set anti-alias for text
+        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
         int signals = data.countChannels();
-        int len = data.getTraceLength();
         int y = 0;
         for (int i = 0; i < signals; i++) {
-            int lastValue = NOT_SET;
             g.setColor(i % 2 == 0 ? Color.WHITE : LIGHTEST_GRAY);
             g.fillRect(0, y, getWidth(), PIN_HEIGHT);
-            for (int c = 0; c < len; c++) {
-                int value = data.getValue(i, c);
-                if(value >= 0) {
-                    g.setColor(Color.BLACK);
-                    if (value != lastValue && lastValue >= 0) {
-                        g.drawLine(c * stepX, y + MARGIN_Y, c * stepX, y + SIGNAL_HEIGHT + MARGIN_Y);
-                    }
-                    int lvl = y  + MARGIN_Y+ (1 - value) * SIGNAL_HEIGHT;
-                    g.drawLine(c * stepX, lvl, (c + 1) * stepX, lvl);
-                } else {
-                    if(value == Data.HIGH_IMP) {
-                        g.setColor(Color.lightGray);
-                    } else {
-                        g.setColor(Color.red.brighter());
-                    }
-                    g.fillRect(c * stepX, y + MARGIN_Y, stepX, SIGNAL_HEIGHT);
-                }
-                lastValue = value;
+            boolean isBus = data.getChannelWidth(i) > 1;
+            if (isBus) {
+                paintBus(g, y, i);
+            } else {
+                paintNet(g, y, i);
             }
             y += PIN_HEIGHT;
+        }
+    }
+
+    private void paintBus(Graphics g, int y, int i) {
+        int lastValue = NOT_SET;
+        for (int c = 0; c < data.getTraceLength(); c++) {
+            int value = data.getValue(i, c);
+            if (value >= 0) {
+                g.setColor(Color.BLACK);
+                if (value != lastValue) {
+                    if (lastValue >= 0) {
+                        g.drawLine(c * stepX - SLOPE_LEN, y + MARGIN_Y,
+                                c * stepX + SLOPE_LEN, y + SIGNAL_HEIGHT + MARGIN_Y);
+                        g.drawLine(c * stepX + SLOPE_LEN, y + MARGIN_Y,
+                                c * stepX - SLOPE_LEN, y + SIGNAL_HEIGHT + MARGIN_Y);
+                        paintValueLabel(g, y, i, c - 1);
+                    } else {
+                        g.drawLine(c * stepX, y + MARGIN_Y + SIGNAL_HEIGHT/2,
+                                c * stepX + SLOPE_LEN, y + SIGNAL_HEIGHT + MARGIN_Y);
+                        g.drawLine(c * stepX, y + MARGIN_Y + SIGNAL_HEIGHT/2,
+                                c * stepX + SLOPE_LEN, y + MARGIN_Y);
+                    }
+                } else {
+                    g.drawLine(c * stepX - SLOPE_LEN, y + MARGIN_Y,
+                            c * stepX + SLOPE_LEN, y + MARGIN_Y);
+                    g.drawLine(c * stepX - SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT,
+                            c * stepX + SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT);
+                }
+                g.drawLine(c * stepX + SLOPE_LEN, y + MARGIN_Y,
+                        (c + 1) * stepX - SLOPE_LEN, y + MARGIN_Y);
+                g.drawLine(c * stepX + SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT,
+                        (c + 1) * stepX - SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT);
+            } else {
+                if (value == Data.HIGH_IMP) {
+                    g.setColor(Color.lightGray);
+                } else {
+                    g.setColor(Color.red.brighter());
+                }
+                g.fillRect(c * stepX, y + MARGIN_Y, stepX, SIGNAL_HEIGHT);
+            }
+            lastValue = value;
+        }
+    }
+
+    private void paintValueLabel(Graphics g, int y, int channel, int cycle) {
+        int val = data.getValue(channel, cycle);
+        int width = data.getChannelWidth(channel);
+        int start = cycle - 1;
+        while(start >= 0 && data.getValue(channel, start) == val) {
+            start --;
+        }
+        start++;
+        String label = String.format("%0" + (width + 3)/4 + "X", val);
+        g.setFont(FONT);
+        int strLen = SwingUtilities.computeStringWidth(g.getFontMetrics(), label);
+        int x = (2 * start + (cycle + 1 - start)) * stepX / 2 - strLen / 2;
+
+        g.drawString(label, x, y + SIGNAL_HEIGHT);
+        Graphics gx = g.create();
+        /*gx.setColor(Color.green);
+        gx.drawRect(x,y+SIGNAL_HEIGHT-20,strLen,20);
+        gx.setColor(Color.blue);
+        gx.drawRect(start*stepX, y, (cycle-start+1)*stepX, SIGNAL_HEIGHT);*/
+    }
+
+    private void paintNet(Graphics g, int y, int i) {
+        int lastValue = NOT_SET;
+        for (int c = 0; c < data.getTraceLength(); c++) {
+            int value = data.getValue(i, c);
+            if (value >= 0) {
+                g.setColor(Color.BLACK);
+                if (value != lastValue && lastValue >= 0) {
+                    g.drawLine(c * stepX, y + MARGIN_Y, c * stepX, y + SIGNAL_HEIGHT + MARGIN_Y);
+                }
+                int lvl = y + MARGIN_Y + (1 - value) * SIGNAL_HEIGHT;
+                g.drawLine(c * stepX, lvl, (c + 1) * stepX, lvl);
+            } else {
+                if (value == Data.HIGH_IMP) {
+                    g.setColor(Color.lightGray);
+                } else {
+                    g.setColor(Color.red.brighter());
+                }
+                g.fillRect(c * stepX, y + MARGIN_Y, stepX, SIGNAL_HEIGHT);
+            }
+            lastValue = value;
         }
     }
 }

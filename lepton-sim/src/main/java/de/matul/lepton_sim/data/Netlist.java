@@ -34,6 +34,7 @@ public class Netlist {
         for (Net net : nets) {
             out.println("Net " + String.join(", ", net.getNames()) + " : " +
                 String.join(", ", net.getConnectedPins()));
+//            out.println("   .width = " + net.getWidth());
         }
     }
 

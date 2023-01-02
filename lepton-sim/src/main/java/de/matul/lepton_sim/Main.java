@@ -40,6 +40,16 @@ public class Main {
                     expander.expand(netlist).print(System.out);
                     break;
 
+                case "inline+expand":
+                    inliner = new Inliner();
+                    netlist = inliner.inline(args[1]);
+                    new WidthChecker().checkWidth(netlist);
+                    netlist.print(System.out);
+                    System.out.println("-----");
+                    netlist = new BusExpander().expand(netlist);
+                    netlist.print(System.out);
+                    break;
+
                 case "compile":
                     NetlistCompiler compiler = new NetlistCompiler();
                     String compilation = compiler.expand(args);

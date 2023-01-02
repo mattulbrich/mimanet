@@ -30,6 +30,8 @@ public class Data {
 
     private List<String> selectedChannels = new ArrayList<>();
 
+    private int[] channelWidths;
+
     private int[][] resolvedData;
 
     public int getValue(String channel, int cycle) {
@@ -53,7 +55,7 @@ public class Data {
         this.netlist = NetlistParser.parse(rawData.getString(Recorder.KEY_NETLIST));
         setSelectedChannels(
                 netlist.getNets().stream().flatMap(x->x.getNames().stream()).
-                        filter(x -> !x.contains("unnamed_net") && !x.contains(" "))
+                        filter(x -> !x.contains("unnamed_net") && !x.contains(" ") && !x.contains("._"))
                         .toList());
     }
 
@@ -78,22 +80,43 @@ public class Data {
         }
 
         int[][] values = new int[selectedChannels.size()][trace.length()];
+        int[] widths = new int[selectedChannels.size()];
         for (int i = 0; i < values.length; i++) {
             String channel = selectedChannels.get(i);
-            if(pinMap.containsKey(channel)) {
-                int pinIndex = pinMap.get(channel);
-                for (int j = 0; j < values[i].length; j++) {
-                    values[i][j] = toInt(((String) trace.get(j)).charAt(pinIndex));
-                }
-            } else {
-                List<Integer> pinsForNet = resolveNetRef(pinMap, channel);
+            if (channel.contains("#")) {
+                List<Integer> pinsForNet = resolveRef(pinMap, channel);
                 for (int j = 0; j < values[i].length; j++) {
                     values[i][j] = resolveNetValue(pinsForNet, (String)trace.get(j));
+                }
+                widths[i] = 1;
+            } else {
+                List<List<Integer>> pinNetList = new ArrayList<>();
+                try {
+                    for (int j = 0; true; j++) {
+                        pinNetList.add(resolveRef(pinMap, channel + "#" + j));
+                        widths[i] = j + 1;
+                    }
+                } catch (NoSuchElementException ex) {
+                    // we are done now ...
+                }
+                for (int j = 0; j < values[i].length; j++) {
+                    int acc = 0;
+                    int l = 0;
+                    for (List<Integer> pinsForNet : pinNetList) {
+                        int v = resolveNetValue(pinsForNet, trace.getString(j));
+                        if(v < 0) {
+                            acc = ERROR;
+                            break;
+                        }
+                        acc += v << l++;
+                    }
+                    values[i][j] = acc;
                 }
             }
         }
 
         this.resolvedData = values;
+        this.channelWidths = widths;
     }
 
     private int resolveNetValue(List<Integer> pinsForNet, String values) {
@@ -118,7 +141,12 @@ public class Data {
         return ERROR;
     }
 
-    private List<Integer> resolveNetRef(Map<String, Integer> pinMap, String channel) {
+    private List<Integer> resolveRef(Map<String, Integer> pinMap, String channel) {
+        Integer pinRes = pinMap.get(channel);
+        if (pinRes != null) {
+            return Collections.singletonList(pinRes);
+        }
+
         for (Net net : netlist.getNets()) {
             if(net.getNames().contains(channel)) {
                 return net.getConnectedPins().stream().
@@ -126,6 +154,7 @@ public class Data {
                         map(pinMap::get).toList();
             }
         }
+
         throw new NoSuchElementException(channel);
     }
 
@@ -163,5 +192,9 @@ public class Data {
 
     public List<String> getPins() {
         return rawData.getJSONArray(Recorder.KEY_PINS).toList().stream().map(Object::toString).toList();
+    }
+
+    public int getChannelWidth(int channel) {
+        return channelWidths[channel];
     }
 }

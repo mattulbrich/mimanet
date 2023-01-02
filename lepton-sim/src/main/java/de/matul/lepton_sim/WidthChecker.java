@@ -52,7 +52,7 @@ public class WidthChecker {
 
         for (Net net : netlist.getNets()) {
             int width = -1;
-            int max = 0;
+            int reqWidthForBuses = 0;
             for (String connectedPin : net.getConnectedPins()) {
                 Integer w;
                 if (connectedPin.contains("#")) {
@@ -60,11 +60,11 @@ public class WidthChecker {
                 } else {
                     w = widthMap.get(connectedPin);
                     if (w == null) {
-                        throw new NoSuchElementException("No width on pin " + connectedPin);
+                        throw new NoSuchElementException("Unknown pin or no width on pin " + connectedPin);
                     }
                 }
                 if(connectedPin.endsWith(" bus")) {
-                    max = Math.max(w - 1, max);
+                    reqWidthForBuses = Math.max(w, reqWidthForBuses);
                 } else {
                     if(width == -1) {
                         width = w;
@@ -79,12 +79,12 @@ public class WidthChecker {
                 }
             }
             if (width == -1) {
-                width = max;
+                width = reqWidthForBuses;
             } else {
-                if (max >= width) {
+                if (reqWidthForBuses > width) {
                     throw new IllegalArgumentException(
                             String.format("Tap %d above width %d on %s",
-                                    max, width, net.getNames().get(0)));
+                                    reqWidthForBuses, width, net.getNames().get(0)));
                 }
             }
 
