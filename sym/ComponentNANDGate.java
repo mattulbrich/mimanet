@@ -1,37 +1,53 @@
 import de.matul.lepton_sim.data.*;
 import de.matul.lepton_sim.sim.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static de.matul.lepton_sim.sim.Signal.*;
 
 public class ComponentNANDGate implements SimComponent {
 
-    private static final Signal[][] NAND = new Signal[][] {
-            { ONE,   ONE,   ERROR, ERROR },
-            { ONE,   ZERO,  ERROR, ERROR },
-            { ERROR, ERROR, ERROR, ERROR }
+    // Order: 0, 1, X, Z
+    private static final Signal[][] AND = new Signal[][] {
+            { ZERO,   ZERO,  ZERO,  ZERO },
+            { ZERO,   ONE,   ERROR, ERROR },
+            { ZERO,   ERROR, ERROR, ERROR },
+            { ZERO,   ERROR, ERROR, ERROR }
     };
 
-    private Pin in1;
-    private Pin in2;
+    private static final Signal[] NOT = new Signal[] {
+            ONE, ZERO, ERROR, ERROR
+    };
+
+    private List<Pin> ins;
     private Pin out;
 
     @Override
     public void register(Simulator simulator, Component component, Netlist compnet) {
-        this.in1 = simulator.getPin(component, "IN1#0");
-        this.in2 = simulator.getPin(component, "IN2#0");
+        ins = new ArrayList<>();
+        if (compnet.getImplementation().getAttribute("width") != null) {
+            int width = compnet.getImplementation().getWidth();
+            for (int i = 0; i < width; i++) {
+                ins.add(simulator.getPin(component, "IN#" + i));
+            }
+        } else {
+            ins.add(simulator.getPin(component, "IN1#0"));
+            ins.add(simulator.getPin(component, "IN2#0"));
+        }
         this.out = simulator.getPin(component, "OUT#0");
 
-        in1.setDriver(this, true);
-        in2.setDriver(this, true);
+        ins.forEach(in -> in.setDriver(this, true));
         out.setDriver(this, false);
-
     }
 
     @Override
     public void recomputeOutputs(Simulator simulator) {
-        Signal signal1 = in1.getNetSignal();
-        Signal signal2 = in2.getNetSignal();
-        Signal sout = NAND[signal1.ordinal()][signal2.ordinal()];
+        Signal signal = ONE;
+        for (Pin in : ins) {
+            signal = AND[signal.ordinal()][in.getNetSignal().ordinal()];
+        }
+        Signal sout = NOT[signal.ordinal()];
         out.setDriverSignal(simulator, sout);
     }
 

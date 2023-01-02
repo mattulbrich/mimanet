@@ -1,0 +1,6 @@
+template = parallel
+n = 24
+component = FULLADD
+parallel_IN = IN1, IN2
+parallel_OUT = OUT
+cascaded = COUT->CIN

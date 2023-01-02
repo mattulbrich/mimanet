@@ -114,6 +114,22 @@ public class Simulator {
         return getPin(component.getName() + "." + name);
     }
 
+    public PinBus getPinBus(Component component, String name) {
+        return getPinBus(component.getName() + "." + name);
+    }
+
+    private PinBus getPinBus(String pinBusName) {
+        PinBus result = new PinBus();
+        int i = 0;
+        Pin pin = allPins.get(pinBusName + "#" + i);
+        while (pin != null) {
+            result.add(pin);
+            i++;
+            pin = allPins.get(pinBusName + "#" + i);
+        }
+        return result;
+    }
+
     private Pin getPin(String pinName) {
         Pin result = allPins.get(pinName);
         if (result == null) {

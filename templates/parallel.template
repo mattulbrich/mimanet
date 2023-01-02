@@ -45,10 +45,11 @@ Component ${fromTo.from}
 </#list>
 
 #### Control pads
-<#list toList(controls) as c>
-Component ${c}
+<#list toList(controls) as c><#assign nw=toPair(c, "1")>
+Component ${nw.from}
   .device=IPAD
   .pintype=control
+  .width=${nw.to}
   .pinseq=${pinseq} <#assign pinseq++>
   
 </#list>

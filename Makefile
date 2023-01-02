@@ -39,7 +39,10 @@ tool:
 	echo 'export t="${tool}"'
 
 %.class: %.java
-	javac --release 11 -g -cp ${jar} $<
+	javac --release 17 -g -cp ${jar} $<
+
+mima.json: all
+	$(tool) simulate sym/MIMA_ENV.net mima.json
 
 test.json: all
 	$(tool) simulate sym/TEST.net test.json

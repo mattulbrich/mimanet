@@ -1,0 +1,5 @@
+template = parallel
+n = 24
+component = NOT
+parallel_IN = IN
+parallel_OUT = OUT

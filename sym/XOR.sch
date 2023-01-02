@@ -14,7 +14,7 @@ C 41600 47600 1 0 0 IPAD.sym
 T 41684 47821 5 10 0 1 0 0 1
 device=IPAD
 T 41600 47638 5 10 1 1 0 0 1
-refdes=IN2	
+refdes=IN2
 T 41600 47495 5 6 1 1 0 0 1
 pinseq=1
 }

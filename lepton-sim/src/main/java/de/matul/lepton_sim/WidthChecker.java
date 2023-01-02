@@ -64,7 +64,7 @@ public class WidthChecker {
                     }
                 }
                 if(connectedPin.endsWith(" bus")) {
-                    max = Math.max(w, max);
+                    max = Math.max(w - 1, max);
                 } else {
                     if(width == -1) {
                         width = w;

@@ -49,7 +49,7 @@ public class NetlistCompiler {
         Map<Object, Object> root = new HashMap<>(p);
         root.put("toInt", (TemplateMethodModelEx) arguments -> Integer.parseInt(arguments.get(0).toString()));
         root.put("toList", (TemplateMethodModelEx) this::toList);
-        root.put("toPair", (TemplateMethodModelEx) arguments -> new Pair(arguments.get(0).toString()));
+        root.put("toPair", (TemplateMethodModelEx) arguments -> new Pair(arguments));
 
         /* Merge data-model with template */
         Writer out = new StringWriter();
@@ -75,10 +75,16 @@ public class NetlistCompiler {
 
         public final String to;
 
-        Pair(String s) {
-            String[] parts = s.split(" *-> *");
+        Pair(List s) {
+            String[] parts = s.get(0).toString().split(" *-> *", 2);
             this.from = parts[0];
-            this.to = parts[1];
+            if (parts.length > 1) {
+                this.to = parts[1];
+            } else if (s.size() > 1) {
+                this.to = s.get(1).toString();
+            } else {
+                this.to = "";
+            }
         }
 
         public String getFrom() {

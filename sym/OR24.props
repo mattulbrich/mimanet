@@ -1,0 +1,5 @@
+template = parallel
+n = 24
+component = OR
+parallel_IN = IN1, IN2
+parallel_OUT = OUT
