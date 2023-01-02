@@ -1,0 +1,35 @@
+v 20210731 2
+C 40000 40000 0 0 0 title-B.sym
+C 43800 48300 1 0 0 IMPLEMENTATION.sym
+{
+T 45300 49000 5 10 1 1 0 5 1
+device=IMPLEMENTATION
+T 46750 49150 5 10 1 1 0 6 1
+refdes=IMPL
+T 43900 48450 5 10 1 0 0 0 1
+class=MicroprogramTable
+T 43900 48100 5 10 1 0 0 0 1
+image=sym/microprogram.dat
+}
+C 42900 48600 1 0 0 IPAD.sym
+{
+T 42984 48821 5 10 0 1 0 0 1
+device=IPAD
+T 42900 48638 5 10 1 1 0 0 1
+refdes=ADDR
+T 42900 48495 5 6 1 1 0 0 1
+pinseq=0
+T 43675 48725 5 6 1 1 0 3 1
+width=8
+}
+C 46800 48600 1 0 0 OPAD.sym
+{
+T 47102 48818 5 10 0 1 0 0 1
+device=OPAD
+T 47102 48635 5 10 1 1 0 0 1
+refdes=DATA
+T 47092 48492 5 6 1 1 0 0 1
+pinseq=0
+T 46925 48725 5 6 1 1 0 3 1
+width=32
+}

@@ -1,0 +1,6 @@
+template = parallel
+n = 8
+component = D_FF
+parallel_IN = DIN
+parallel_OUT = Q, Q_N
+controls = CLK
