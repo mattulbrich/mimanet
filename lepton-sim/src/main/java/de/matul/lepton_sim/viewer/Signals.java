@@ -156,6 +156,10 @@ public class Signals extends JComponent {
                         (c + 1) * stepX - SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT);
             } else {
                 if (lastValue >= 0) {
+                    g.drawLine(c * stepX - SLOPE_LEN, y + MARGIN_Y,
+                            c * stepX, y + MARGIN_Y + SIGNAL_HEIGHT / 2);
+                    g.drawLine(c * stepX - SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT,
+                            c * stepX, y + MARGIN_Y + SIGNAL_HEIGHT / 2);
                     paintValueLabel(g, y, i, c - 1);
                 }
                 if (value == Data.HIGH_IMP) {
@@ -180,6 +184,11 @@ public class Signals extends JComponent {
         String label = String.format("%0" + (width + 3)/4 + "X", val);
         g.setFont(FONT);
         int strLen = SwingUtilities.computeStringWidth(g.getFontMetrics(), label);
+        if (strLen > (cycle + 1 - start) * stepX) {
+            // label too wide
+            return;
+        }
+
         int x = (2 * start + (cycle + 1 - start)) * stepX / 2 - strLen / 2;
 
         g.drawString(label, x, y + SIGNAL_HEIGHT);
