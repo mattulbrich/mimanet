@@ -25,6 +25,7 @@ public class Recorder {
         char[] chars = new char[allPinNames.length];
         int i = 0;
         for (Pin value : allPins.values()) {
+//            chars[i++] = value.getNetSignal().toChar();
             chars[i++] = value.getDriverSignal().toChar();
         }
         trace.add(new String(chars));

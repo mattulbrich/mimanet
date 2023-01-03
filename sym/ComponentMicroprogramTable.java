@@ -60,6 +60,7 @@ public class ComponentMicroprogramTable implements SimComponent {
         Map<String, Integer> bitMap = new HashMap<>();
         int pc = 0;
         for (String line : lines) {
+            if(line.isBlank()) continue;
             switch (line.charAt(0)) {
                 case '=':
                     pc = Integer.decode(line.substring(1).trim());
@@ -83,14 +84,16 @@ public class ComponentMicroprogramTable implements SimComponent {
                     break;
                 case ':':
                     String[] cmds = line.substring(1).trim().split(" +");
+                    int next = pc + 1;
                     long value = 0;
                     for (String cmd : cmds) {
                         if(cmd.startsWith("#")) {
-                            value |= labelMap.get(cmd.substring(1));
+                            next = labelMap.get(cmd.substring(1));
                         } else {
                             value |= (1L << bitMap.get(cmd));
                         }
                     }
+                    value |= next;
                     table[pc] = value;
                     pc++;
                     break;

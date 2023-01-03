@@ -9,7 +9,7 @@ refdes=IMPL
 T 43900 48450 5 10 1 0 0 0 1
 class=MicroprogramTable
 T 43900 48100 5 10 1 0 0 0 1
-image=sym/microprogram.dat
+table=sym/microprogram.dat
 }
 C 42900 48600 1 0 0 IPAD.sym
 {

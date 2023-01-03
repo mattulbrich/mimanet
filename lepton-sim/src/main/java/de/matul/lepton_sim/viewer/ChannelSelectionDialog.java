@@ -212,7 +212,7 @@ public class ChannelSelectionDialog extends JDialog {
                     shortName = baseName;
                 }
                 String title = String.format("Pin %s (primary)", shortName);
-                parent = new MyNode(new Entry(title, pin));
+                parent = new MyNode(new Entry(title, baseName));
                 grandparent.add(parent);
                 nodeMap.put(baseName, parent);
             }

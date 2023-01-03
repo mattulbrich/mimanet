@@ -1,0 +1,70 @@
+ Microprogram for the MIMA
+
+ Lines starting with $ define "bits" (<control_bit> = <number in word>)
+ Lines starting with : define steps
+ Lines starting with # define labels
+ Lines starting with = define an address where to write
+ Other lines are ignored
+
+ 0 is the reset line
+
+$ s_accu = 8
+$ d_accu = 9
+$ s_iar = 10
+$ d_iar = 11
+$ s_adr = 12
+$ ram_r = 13
+$ ram_w = 14
+$ d_ram = 15
+$ s_ram = 16
+$ d_ramval = 17
+$ s_ramval = 18
+$ s_rx = 19
+$ s_ry = 20
+$ d_alu = 21
+$ s_ir = 22
+$ d_ir = 23
+$ alu0 = 24
+$ alu1 = 25
+$ alu2 = 26
+$ alu3 = 27
+
+$ jmp = 28
+$ instr_load = 29
+
+= 0
+: s_iar alu0 alu1 alu2 d_alu
+  This means writing "0" (ALU=7) to IAR
+
+= 1
+#fetch
+: d_iar s_adr ram_r
+: alu3 d_alu s_ry ram_r
+: d_iar s_rx ram_r
+: d_alu s_iar ram_r s_ramval
+: ram_r s_ramval d_ram s_ir
+: instr_load #table
+
+= 0x20
+#table
+ Here is the instruction lookup table
+
+= 0x30
+ LDC:
+: d_ir s_accu #fetch
+
+ LDV:
+: d_ir s_adr ram_r #ldv
+
+ STV:
+: d_ir s_adr #stv
+
+#ldv
+: ram_r
+: ram_r
+: ram_r s_ramval d_ram s_accu #fetch
+
+#stv
+: d_accu s_ram d_ramval ram_w
+: ram_w
+: ram_w #fetch

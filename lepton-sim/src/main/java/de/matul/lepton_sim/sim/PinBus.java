@@ -18,6 +18,7 @@ public class PinBus {
 
     public long getNetBusValue() {
         long result = 0;
+        long pos = 1;
         for (Pin pin : pins) {
             Signal netSignal = pin.getNetSignal();
             int v;
@@ -26,7 +27,8 @@ public class PinBus {
                 case ZERO: v = 0; break;
                 default: return -1;
             };
-            result = 2 * result + v;
+            result |= v * pos;
+            pos <<= 1;
         }
         return result;
     }
@@ -39,5 +41,8 @@ public class PinBus {
     }
 
     public void setAllDriverSignals(Simulator simulator, Signal signal) {
+        for (Pin pin : pins) {
+            pin.setDriverSignal(simulator, signal);
+        }
     }
 }

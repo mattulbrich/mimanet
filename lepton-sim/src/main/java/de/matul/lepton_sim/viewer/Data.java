@@ -13,10 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 public class Data {
 
@@ -100,15 +102,20 @@ public class Data {
                     // we are done now ...
                 }
                 for (int j = 0; j < values[i].length; j++) {
-                    int acc = 0;
-                    int l = 0;
-                    for (List<Integer> pinsForNet : pinNetList) {
-                        int v = resolveNetValue(pinsForNet, trace.getString(j));
-                        if(v < 0) {
-                            acc = ERROR;
-                            break;
+                    int acc;
+                    int fj = j;
+                    List<Integer> signals = pinNetList.stream().
+                            map(x -> resolveNetValue(x, trace.getString(fj))).toList();
+                    if(signals.stream().allMatch(x -> x == HIGH_IMP)) {
+                        acc = HIGH_IMP;
+                    } else if (signals.stream().anyMatch(x -> x < 0)) {
+                        acc = ERROR;
+                    } else {
+                        acc = 0;
+                        int l = 0;
+                        for (Integer signal : signals) {
+                            acc += signal << l++;
                         }
-                        acc += v << l++;
                     }
                     values[i][j] = acc;
                 }

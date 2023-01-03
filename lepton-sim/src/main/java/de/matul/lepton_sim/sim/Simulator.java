@@ -29,6 +29,7 @@ public class Simulator {
     private List<TickReceiver> tickReceivers = new ArrayList<>();
 
     private Recorder recorder;
+    private int round;
 
 
     public Simulator() throws MalformedURLException {
@@ -47,7 +48,7 @@ public class Simulator {
 
     private void runSimulation(int rounds) {
 
-        for (int round = 0; round < rounds; round++) {
+        for (round = 0; round < rounds; round++) {
             int finalRound = round;
             tickReceivers.forEach(x -> x.tick(finalRound));
             queuedComponents.clear();
@@ -156,5 +157,9 @@ public class Simulator {
 
     public void printTo(String filename) throws IOException {
         Files.writeString(Paths.get(filename), recorder.toJSON());
+    }
+
+    public int getRound() {
+        return round;
     }
 }

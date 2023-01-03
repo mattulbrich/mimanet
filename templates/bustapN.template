@@ -13,11 +13,11 @@ Component BT${i}
   .device=BUSTAP
   .spec=${i}
   
-Net btnet${i}: BT${i} tapped, OUT${i} OPAD
+Net _btnet${i}: BT${i} tapped, OUT${i} OPAD
 
 </#list>
 
-Net btbus: IN IPAD<#list 0..toInt(n)-1 as i>, BT${i} bus</#list>
+Net _btbus: IN IPAD<#list 0..toInt(n)-1 as i>, BT${i} bus</#list>
 
 
   

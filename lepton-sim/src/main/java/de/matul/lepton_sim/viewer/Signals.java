@@ -142,6 +142,9 @@ public class Signals extends JComponent {
                 g.drawLine(c * stepX + SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT,
                         (c + 1) * stepX - SLOPE_LEN, y + MARGIN_Y + SIGNAL_HEIGHT);
             } else {
+                if (lastValue >= 0) {
+                    paintValueLabel(g, y, i, c - 1);
+                }
                 if (value == Data.HIGH_IMP) {
                     g.setColor(Color.lightGray);
                 } else {

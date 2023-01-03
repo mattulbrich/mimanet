@@ -69,9 +69,10 @@ public class Main {
                         netlist = new BusExpander().expand(netlist);
                         Simulator simulator = new Simulator();
                         simulator.simulate(netlist);
-                        simulator.print();
                         if (args.length > 2) {
                             simulator.printTo(args[2]);
+                        } else {
+                            simulator.print();
                         }
                     } catch(Exception ex) {
                         System.err.println("Problematic netlist: ");

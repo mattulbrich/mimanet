@@ -12,7 +12,7 @@ Component BT_${c}_${i}
   .spec=${i}
 </#list>
 
-Net bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
+Net _bus_${c}: ${c} IPAD <#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
 
 </#list>
 
@@ -29,7 +29,7 @@ Component BT_${c}_${i}
   .spec=${i}
 </#list>
 
-Net bus_${c}: ${c} OPAD<#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
+Net _bus_${c}: ${c} OPAD<#list 0..toInt(n)-1 as i>, BT_${c}_${i} bus</#list>
 
 </#list>
 
@@ -60,23 +60,23 @@ Component U${i}
   .device=${component}
 
 <#list toList(parallel_IN) as c>
-Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
+Net _${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
 </#list>
 <#list toList(parallel_OUT) as c>
-Net ${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
+Net _${c}_${i}: BT_${c}_${i} tapped, U${i} ${c}
 </#list>
 <#if i != 0>
 <#list toList(cascaded) as c><#assign fromTo=toPair(c)>
-Net ${fromTo.from}_${fromTo.to}_${i}: U${i-1} ${fromTo.from}, U${i} ${fromTo.to}
+Net _${fromTo.from}_${fromTo.to}_${i}: U${i-1} ${fromTo.from}, U${i} ${fromTo.to}
 </#list>
 </#if>
 
 </#list>
 <#list toList(controls) as c><#assign nw=toPair(c, "1")>
-Net net_${nw.from}: ${nw.from} IPAD<#list 0..toInt(n)-1 as i>, U${i} ${nw.from}</#list>
+Net _net_${nw.from}: ${nw.from} IPAD<#list 0..toInt(n)-1 as i>, U${i} ${nw.from}</#list>
 </#list>
 
 <#list toList(cascaded) as c><#assign fromTo=toPair(c)>
-Net in_${fromTo.to}: ${fromTo.to} IPAD, U0 ${fromTo.to}
-Net out_${fromTo.from}: ${fromTo.from} OPAD, U${toInt(n)-1} ${fromTo.from}
+Net _in_${fromTo.to}: ${fromTo.to} IPAD, U0 ${fromTo.to}
+Net _out_${fromTo.from}: ${fromTo.from} OPAD, U${toInt(n)-1} ${fromTo.from}
 </#list>
