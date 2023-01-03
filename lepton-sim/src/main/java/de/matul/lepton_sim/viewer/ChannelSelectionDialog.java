@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ChannelSelectionDialog extends JDialog {
-    private static final Pattern LASTDOT = Pattern.compile("(.*)\\.([^.]*)");
     private final Data data;
     private MyNode treeRoot;
     private MouseListener rightClick = new MouseAdapter() {
@@ -109,7 +108,20 @@ public class ChannelSelectionDialog extends JDialog {
             item = new JMenuItem("Select all below");
             item.addActionListener(a -> selectRec(sel, true));
             popupMenu.add(item);
+            item = new JMenuItem("Select all direct children");
+            item.addActionListener(a -> selectChildren(sel, true));
+            popupMenu.add(item);
             popupMenu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    private void selectChildren(MyNode sel, boolean b) {
+        Enumeration<TreeNode> en = sel.children();
+        while (en.hasMoreElements()) {
+            MyNode node = (MyNode) en.nextElement();
+            if (node.getUserObject() instanceof Entry entry) {
+                entry.setSelected(b);
+            }
         }
     }
 
@@ -180,7 +192,7 @@ public class ChannelSelectionDialog extends JDialog {
                         grandparent = nodeMap.get(name.substring(0, space));
                         shortName = "Pin " + baseName.substring(space + 1);
                     }
-                    if(shortName.startsWith("Net unnamed_net")) {
+                    if(shortName.startsWith("Net unnamed_net") || shortName.startsWith("Net _")) {
                         continue;
                     }
                     parent = new MyNode(new Entry(shortName, baseName));

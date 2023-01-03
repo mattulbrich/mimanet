@@ -28,6 +28,8 @@ public class Viewer extends JFrame {
 
         this.signals = new Signals(data);
         JScrollPane scrollPane = new JScrollPane(signals);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(15);
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         contentPane.add(makeToolbar(), BorderLayout.NORTH);

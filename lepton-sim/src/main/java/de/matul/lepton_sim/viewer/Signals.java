@@ -3,7 +3,11 @@ package de.matul.lepton_sim.viewer;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Signals extends JComponent {
 
@@ -16,12 +20,21 @@ public class Signals extends JComponent {
     private static final int NOT_SET = -4;
     private static final int SLOPE_LEN = 8;
     private static final int SIGNAL_HEIGHT = PIN_HEIGHT - 2 * MARGIN_Y;
+
+    private MouseListener mouseListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            mouseClick(e);
+        }
+    };
+
     private final Data data;
 
     private int stepX = 30;
 
     public Signals(Data data) {
         this.data = data;
+        addMouseListener(mouseListener);
         recomputeSizeFromData();
     }
 
@@ -36,11 +49,11 @@ public class Signals extends JComponent {
     }
 
     private class RowHeader extends JComponent {
+
         private static final int HEADER_WIDTH = 120;
         private static final Dimension PREF_SIZE =
                 new Dimension(HEADER_WIDTH, 20);
         private static final int Y_LABEL_OFFSET = 40;
-
         RowHeader() {
             setBorder(new BevelBorder(BevelBorder.RAISED));
             setOpaque(false);
@@ -66,8 +79,8 @@ public class Signals extends JComponent {
                 y += PIN_HEIGHT;
             }
         }
-    }
 
+    }
     public void addNotify() {
         super.addNotify();
         configureEnclosingScrollPane();
@@ -197,6 +210,44 @@ public class Signals extends JComponent {
                 g.fillRect(c * stepX, y + MARGIN_Y, stepX, SIGNAL_HEIGHT);
             }
             lastValue = value;
+        }
+    }
+
+    private void mouseClick(MouseEvent e) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            int no = e.getX() / stepX;
+            int channelIdx = e.getY() / PIN_HEIGHT;
+            int width = data.getChannelWidth(channelIdx);
+            StringBuilder msg;
+            if(width == 1) {
+                String channel = data.getSelectedChannels().get(channelIdx);
+                List<String> pins = data.getPinsForNet(channel);
+                if(pins == null) {
+                    String net = data.getNetForPin(channel);
+                    pins = data.getPinsForNet(net);
+                    int value = data.getValue(channelIdx, no);
+                    msg = new StringBuilder(String.format("Step %d%n%n%s is a primary pin with value %s.%nThe values of the pins in its net %s are:%n",
+                            no, channel, net, value));
+                } else {
+                    int value = data.getValue(channelIdx, no);
+                    msg = new StringBuilder(String.format("Step %d%n%n%s is a net with value %s.%nThe values of the pins in the net are:%n",
+                            no, channel, value));
+                }
+                for (String pin : pins) {
+                    try {
+                        int value = data.getRawPinValue(pin.replace(" ", "."), no);
+                        msg.append(String.format("  %-30s : %c%n", pin, value));
+                    } catch (NoSuchElementException exception) {
+                        msg.append(String.format("  %-30s : not found%n", pin));
+                    }
+                }
+                JTextArea ta = new JTextArea(msg.toString());
+                ta.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+                ta.setEditable(false);
+                JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(this), ta);
+
+            }
+
         }
     }
 }

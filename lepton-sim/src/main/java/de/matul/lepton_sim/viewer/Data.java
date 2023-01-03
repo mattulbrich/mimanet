@@ -44,6 +44,12 @@ public class Data {
         return getValue(index, cycle);
     }
 
+    public char getRawPinValue(String pinName, int cycle) {
+        int idx = getPins().indexOf(pinName);
+        String s = getRawData().getJSONArray(Recorder.KEY_TRACE).getString(cycle);
+        return s.charAt(idx);
+    }
+
     public int getValue(int channel, int cycle) {
         return resolvedData[channel][cycle];
     }
@@ -203,5 +209,23 @@ public class Data {
 
     public int getChannelWidth(int channel) {
         return channelWidths[channel];
+    }
+
+    public List<String> getPinsForNet(String channel) {
+        for (Net net : getNetlist().getNets()) {
+            if (net.getNames().contains(channel)) {
+                return net.getConnectedPins();
+            }
+        }
+        return null;
+    }
+
+    public String getNetForPin(String channel) {
+        for (Net net : getNetlist().getNets()) {
+            if (net.getConnectedPins().contains(channel)) {
+                return net.getNames().get(0);
+            }
+        }
+        return null;
     }
 }
