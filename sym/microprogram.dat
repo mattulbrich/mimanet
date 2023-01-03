@@ -8,6 +8,8 @@
 
  0 is the reset line
 
+ Not all instructions have been implemented ... the rest seems clear
+
 $ s_accu = 8
 $ d_accu = 9
 $ s_iar = 10
@@ -39,15 +41,31 @@ $ instr_load = 29
 = 1
 #fetch
 : d_iar s_adr ram_r
+#fetch2
 : alu3 d_alu s_ry ram_r
 : d_iar s_rx ram_r
 : d_alu s_iar ram_r s_ramval
 : ram_r s_ramval d_ram s_ir
 : instr_load #table
 
+= 0x18
+ JMN must be positive address. ... Will rearrange later anyway
+#jmn
+: d_iar s_adr ram_r #fetch2
+  In case of positive: go fetch
+: d_ir s_iar #fetch
+  In case of negatvie: overwrite iar and fetch
+
 = 0x20
 #table
  Here is the instruction lookup table
+ 
+ HALT
+#halt
+: #halt
+
+ NOT
+: d_accu s_rx #not
 
 = 0x30
  LDC:
@@ -62,7 +80,34 @@ $ instr_load = 29
  ADD:
 : d_ir s_adr ram_r #add
 
+ AND:
+: d_ir s_adr ram_r #and
+
+ OR:
+: d_ir s_adr ram_r #or
+
+ XOR:
+: d_ir s_adr ram_r #xor
+
+ EQL:
+: d_ir s_adr ram_r #eql
+
+ JMP:
+: d_ir s_iar #fetch
+
+ JMN:
+: #jmn jmp
+
+ LDIV:
+: d_ir s_adr ram_r #ldiv
+
+ STIV:
+: d_ir s_adr ram_r #stiv
+
 = 0x40
+#not
+: alu2 alu1 d_alu s_accu #fetch
+
 #ldv
 : ram_r
 : ram_r
@@ -73,7 +118,7 @@ $ instr_load = 29
 : d_accu s_ram d_ramval ram_w
 : d_ramval ram_w
 : d_ramval ram_w
-: d_ramval ram_w #fetch
+: d_ramval #fetch
 
 #add
 : ram_r
@@ -82,3 +127,56 @@ $ instr_load = 29
 : d_ram s_ry 
 : d_alu s_accu #fetch
  Adding is alu mode 0
+
+#and
+: ram_r
+: d_accu s_rx ram_r
+: ram_r s_ramval
+: d_ram s_ry 
+: alu0 alu1 d_alu s_accu #fetch
+ Adding is alu mode 3
+
+#or
+: ram_r
+: d_accu s_rx ram_r
+: ram_r s_ramval
+: d_ram s_ry 
+: alu2 d_alu s_accu #fetch
+ Adding is alu mode 4
+
+#xor
+: ram_r
+: d_accu s_rx ram_r
+: ram_r s_ramval
+: d_ram s_ry 
+: alu2 alu0 d_alu s_accu #fetch
+ Adding is alu mode 5
+
+#eql
+: ram_r
+: d_accu s_rx ram_r
+: ram_r s_ramval
+: d_ram s_ry 
+: alu0 d_alu s_accu #fetch
+ Adding is alu mode 1
+
+#ldiv
+: ram_r
+: ram_r
+: ram_r s_ramval
+: d_ram s_adr
+: ram_r
+: ram_r
+: ram_r
+: ram_r s_ramval
+: d_ram s_accu #fetch
+
+#stiv
+: ram_r d_accu s_ram
+: ram_r
+: ram_r s_ramval
+: d_ram s_adr
+: d_ramval ram_w 
+: d_ramval ram_w
+: d_ramval ram_w
+: d_ramval #fetch

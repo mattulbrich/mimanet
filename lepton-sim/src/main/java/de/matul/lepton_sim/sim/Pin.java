@@ -30,6 +30,8 @@ public class Pin {
     }
 
     public void setDriverSignal(Simulator sim, Signal driverSignal) {
+//        System.out.println(new Throwable().getStackTrace()[1]);
+//        System.out.println(name + ": " + this.driverSignal + "->" + driverSignal);
         this.driverSignal = driverSignal;
         if (simNet != null) {
             simNet.recompute(sim);

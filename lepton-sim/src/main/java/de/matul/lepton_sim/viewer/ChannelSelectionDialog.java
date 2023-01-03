@@ -192,7 +192,7 @@ public class ChannelSelectionDialog extends JDialog {
                         grandparent = nodeMap.get(name.substring(0, space));
                         shortName = "Pin " + baseName.substring(space + 1);
                     }
-                    if(shortName.startsWith("Net unnamed_net") || shortName.startsWith("Net _")) {
+                    if(shortName.startsWith("Net unnamed_net") /*|| shortName.startsWith("Net _")*/) {
                         continue;
                     }
                     parent = new MyNode(new Entry(shortName, baseName));

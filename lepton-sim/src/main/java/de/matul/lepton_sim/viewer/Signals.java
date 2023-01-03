@@ -191,9 +191,10 @@ public class Signals extends JComponent {
 
         int x = (2 * start + (cycle + 1 - start)) * stepX / 2 - strLen / 2;
 
-        g.drawString(label, x, y + SIGNAL_HEIGHT);
-        Graphics gx = g.create();
-        /*gx.setColor(Color.green);
+        if(g.getClipBounds().contains(x, y + SIGNAL_HEIGHT))
+            g.drawString(label, x, y + SIGNAL_HEIGHT);
+        /*Graphics gx = g.create();
+        gx.setColor(Color.green);
         gx.drawRect(x,y+SIGNAL_HEIGHT-20,strLen,20);
         gx.setColor(Color.blue);
         gx.drawRect(start*stepX, y, (cycle-start+1)*stepX, SIGNAL_HEIGHT);*/

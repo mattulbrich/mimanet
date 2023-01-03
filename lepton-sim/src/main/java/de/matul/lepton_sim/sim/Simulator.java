@@ -43,7 +43,7 @@ public class Simulator {
         buildEnv(netlist);
         recorder.registerPins(allPins);
         recorder.registerNet(netlist);
-        runSimulation(1000);
+        runSimulation(10000);
     }
 
     private void runSimulation(int rounds) {
