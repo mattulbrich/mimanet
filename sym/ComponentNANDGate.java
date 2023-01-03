@@ -26,14 +26,16 @@ public class ComponentNANDGate implements SimComponent {
     @Override
     public void register(Simulator simulator, Component component, Netlist compnet) {
         ins = new ArrayList<>();
-        if (compnet.getImplementation().getAttribute("width") != null) {
-            int width = compnet.getImplementation().getWidth();
+        if (compnet.getImplementation().getAttribute("bus") != null) {
+            int width = compnet.getImplementation().getIntAttribute("bus", 1);
             for (int i = 0; i < width; i++) {
                 ins.add(simulator.getPin(component, "IN#" + i));
             }
         } else {
-            ins.add(simulator.getPin(component, "IN1#0"));
-            ins.add(simulator.getPin(component, "IN2#0"));
+            int width = compnet.getImplementation().getIntAttribute("width", 2);
+            for (int i = 1; i <= width; i++) {
+                ins.add(simulator.getPin(component, "IN" + i + "#0"));
+            }
         }
         this.out = simulator.getPin(component, "OUT#0");
 

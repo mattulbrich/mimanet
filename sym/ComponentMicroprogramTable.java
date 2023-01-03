@@ -8,11 +8,13 @@ import de.matul.lepton_sim.sim.Simulator;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static de.matul.lepton_sim.sim.Signal.ERROR;
 import static de.matul.lepton_sim.sim.Signal.ONE;
@@ -38,15 +40,23 @@ public class ComponentMicroprogramTable implements SimComponent {
         if (img != null) {
             try {
                 fillTable(compnet.getImplementation().getAttribute("table"));
+                // printTable();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
+    private void printTable() {
+        for (int i = 0; i < table.length; i++) {
+            System.out.printf("Entry %02x : %08x%n", i, table[i]);
+        }
+    }
+
     @Override
     public void recomputeOutputs(Simulator simulator) {
         int a = (int)addr.getNetBusValue();
+        // System.out.printf("Reading table at %x at %d%n", a, simulator.getRound());
         if (a >= 0) {
             data.setDriverBusSignal(simulator, table[a]);
         } else {
@@ -78,6 +88,7 @@ public class ComponentMicroprogramTable implements SimComponent {
         }
         pc = 0;
         for (String line : lines) {
+            if(line.isBlank()) continue;
             switch (line.charAt(0)) {
                 case '=':
                     pc = Integer.decode(line.substring(1).trim());
@@ -88,8 +99,14 @@ public class ComponentMicroprogramTable implements SimComponent {
                     long value = 0;
                     for (String cmd : cmds) {
                         if(cmd.startsWith("#")) {
+                            if (!labelMap.containsKey(cmd.substring(1))) {
+                                throw new NoSuchElementException("Unknown label: " + cmd);
+                            }
                             next = labelMap.get(cmd.substring(1));
                         } else {
+                            if (!bitMap.containsKey(cmd)) {
+                                throw new NoSuchElementException(cmd);
+                            }
                             value |= (1L << bitMap.get(cmd));
                         }
                     }
