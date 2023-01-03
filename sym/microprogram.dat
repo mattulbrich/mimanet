@@ -59,12 +59,26 @@ $ instr_load = 29
  STV:
 : d_ir s_adr #stv
 
+ ADD:
+: d_ir s_adr ram_r #add
+
+= 0x40
 #ldv
 : ram_r
 : ram_r
-: ram_r s_ramval d_ram s_accu #fetch
+: ram_r s_ramval
+: d_ram s_accu #fetch
 
 #stv
 : d_accu s_ram d_ramval ram_w
-: ram_w
-: ram_w #fetch
+: d_ramval ram_w
+: d_ramval ram_w
+: d_ramval ram_w #fetch
+
+#add
+: ram_r
+: d_accu s_rx ram_r
+: ram_r s_ramval
+: d_ram s_ry 
+: d_alu s_accu #fetch
+ Adding is alu mode 0
