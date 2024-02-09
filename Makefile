@@ -18,10 +18,10 @@ check: $(SYM_NET) $(SYM_NET_PROP)
 	for x in sym/*.net; do echo "Check $$x:" ; $(tool) widthcheck $$x || exit; done
 
 %.symnet : %.sch 
-	lepton-netlist -g mu $< -o $@
+	lepton-netlist -L . -g mu $< -o $@
 
 %.net : %.sch $(SYM_SYM)
-	lepton-netlist -g mu $< -o $@
+	lepton-netlist -L . -g mu $< -o $@
 
 %.sym : %.symnet 
 	$(tool) sym $< > $@
