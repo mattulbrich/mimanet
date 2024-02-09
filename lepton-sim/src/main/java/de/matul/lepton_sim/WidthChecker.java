@@ -12,8 +12,8 @@ import java.util.NoSuchElementException;
 
 public class WidthChecker {
 
-    public void checkWidths(String[] args) throws IOException {
-        String filename = args[1];
+    public void checkWidths(String file) throws IOException {
+        String filename = file;
         Netlist netlist = NetlistParser.parseFile(filename);
         checkWidth(netlist);
         // netlist.print(System.out);

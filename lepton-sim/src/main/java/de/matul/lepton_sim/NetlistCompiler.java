@@ -38,10 +38,10 @@ public class NetlistCompiler {
         cfg.setFallbackOnNullLoopVariable(false);
     }
 
-    public String expand(String[] args) throws IOException, TemplateException {
+    public String expand(String arg) throws IOException, TemplateException {
 
         Properties p = new Properties();
-        p.load(new FileReader(args[1]));
+        p.load(new FileReader(arg));
 
         Template temp = cfg.getTemplate(p.get("template") + ".template");
 

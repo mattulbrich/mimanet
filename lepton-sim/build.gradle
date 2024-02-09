@@ -26,6 +26,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'org.freemarker:freemarker:2.3.31'
     implementation 'org.json:json:20220924'
+    implementation 'info.picocli:picocli:4.7.5'
 }
 
 test {
