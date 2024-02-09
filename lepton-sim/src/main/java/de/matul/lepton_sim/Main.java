@@ -111,7 +111,7 @@ public class Main {
     }
 
     @Command(name ="compile",
-            description = "compile a netlist to ...")
+            description = "expand templates to full netlists (.props -> .net)")
     public void compileCommand(@Parameters(paramLabel = "<inFile>", description = "file to operate on", arity = "1") String file,
                                @Parameters(paramLabel = "<outFile>", description = "file to write to", arity = "0..1") String toFile)
             throws TemplateException, IOException {
